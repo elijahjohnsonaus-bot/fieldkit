@@ -577,27 +577,43 @@ ${logbook()}
 FIELD NOTES
 ${fieldNotes()}`;
 }
-async function gemini(turns){
-  if(!C.key)throw new Error("NOKEY");
-  const body=JSON.stringify({systemInstruction:{parts:[{text:systemPrompt()}]},contents:turns.map(t=>({role:t.role,parts:[{text:t.text}]})),generationConfig:{temperature:0.8}});
-  const call=m=>fetch(`${API}/${encodeURIComponent(m)}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":C.key},body});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function modelChain(){
+  const first=C.model||DEFAULT_MODEL;
+  const pool=(C.models&&C.models.length?C.models:[DEFAULT_MODEL,FALLBACK_MODEL]).filter(m=>/flash/.test(m)&&!/preview|exp/.test(m)&&m!==first);
+  pool.sort((x,y)=>(/lite/.test(x)?1:0)-(/lite/.test(y)?1:0));
+  return [first,...pool].slice(0,4);
+}
+/* one call to one model. Returns {text} or {status,msg,fatal} */
+async function callModel(m,body){
   let res;
-  try{res=await call(C.model||DEFAULT_MODEL);
-    if(res.status===404&&(C.model||DEFAULT_MODEL)!==FALLBACK_MODEL)res=await call(FALLBACK_MODEL);
-  }catch(e){throw new Error("Could not reach Gemini. Check your connection. If you are looking at this inside a chat preview, AI calls are blocked there, so open the hosted page instead.");}
+  try{res=await fetch(`${API}/${encodeURIComponent(m)}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":C.key},body});}
+  catch(e){return {fatal:"Could not reach Gemini. Check your connection. If you are looking at this inside a chat preview, AI calls are blocked there, so open the hosted page instead."};}
   let data={};try{data=await res.json();}catch(e){}
+  const msg=((data.error&&data.error.message)||"").replace(/\s+/g," ").slice(0,160);
   if(!res.ok){
-    const msg=(data.error&&data.error.message)||"";
-    if(res.status===400&&/API key/i.test(msg)||res.status===401||res.status===403)throw new Error("Gemini rejected the API key. Open Settings and check it.");
-    if(res.status===429)throw new Error("Gemini's rate limit was hit. Wait a minute and try again.");
-    if(res.status===404)throw new Error("That Gemini model was not found. Open Settings, test the connection and pick a model from the list.");
-    if(res.status>=500)throw new Error("Gemini is having trouble right now. Try again shortly.");
-    throw new Error("Gemini error "+res.status+(msg?": "+msg.slice(0,160):""));
+    if(res.status===401||(res.status===400&&/API key/i.test(msg)))return {fatal:"Gemini rejected the API key. Open Settings and check it."};
+    return {status:res.status,msg};
   }
   const cand=data.candidates&&data.candidates[0];
   const text=cand&&cand.content&&cand.content.parts?cand.content.parts.filter(p=>p.text&&!p.thought).map(p=>p.text).join("").trim():"";
-  if(!text)throw new Error("Gemini sent back an empty reply"+(data.promptFeedback&&data.promptFeedback.blockReason?" ("+data.promptFeedback.blockReason+")":"")+". Try rewording.");
-  return text;
+  if(!text)return {status:200,msg:"empty reply"+(data.promptFeedback&&data.promptFeedback.blockReason?", blocked: "+data.promptFeedback.blockReason:"")+(cand&&cand.finishReason?", "+cand.finishReason:"")};
+  return {text};
+}
+async function gemini(turns){
+  if(!C.key)throw new Error("NOKEY");
+  const body=JSON.stringify({systemInstruction:{parts:[{text:systemPrompt()}]},contents:turns.map(t=>({role:t.role,parts:[{text:t.text}]}))});
+  const chain=modelChain();let last="";
+  for(let i=0;i<chain.length;i++){
+    const m=chain[i];
+    let r=await callModel(m,body);
+    if(!r.text&&!r.fatal&&r.status>=500){await sleep(1500);r=await callModel(m,body);}   // busy servers often clear on a second try
+    if(r.fatal)throw new Error(r.fatal);
+    if(r.text){UI.lastModel=m;if(i>0)toast(chain[0]+" was busy, so "+m+" answered");return r.text;}
+    last=m+" gave error "+r.status+(r.msg?" ("+r.msg+")":"");
+    if(r.status===400)break;
+  }
+  throw new Error("Gemini could not answer. "+last+". Wait a minute and try again, or pick a different model in Settings.");
 }
 const ORDERS={
  next:["What should I do next?","Based on my logbook, what should I tackle next? Give me the single best next mission or activity and two back-ups, with one line each on why it suits my rank and kit."],
@@ -609,7 +625,7 @@ const QUICK=["How do I get gunpowder?","Where do I find depleted uranium?","How 
 async function runOrder(k){
   if(UI.busy)return;UI.busy=k;UI.err.advisor="";render();
   try{const text=await gemini([{role:"user",text:ORDERS[k][1]}]);
-    S.briefs.unshift({id:Date.now(),title:ORDERS[k][0],text,at:Date.now(),rank:S.rank});S.briefs=S.briefs.slice(0,8);save();
+    S.briefs.unshift({id:Date.now(),title:ORDERS[k][0],text,at:Date.now(),rank:S.rank,model:UI.lastModel||""});S.briefs=S.briefs.slice(0,8);save();
   }catch(e){UI.err.advisor=e.message==="NOKEY"?"":e.message;}
   UI.busy=false;render();
 }
@@ -631,7 +647,7 @@ function viewAdvisor(){
     <button class="wide" data-order="full" ${UI.busy||!C.key?"disabled":""}>Full briefing</button></div>`;
   if(UI.busy&&UI.busy!=="ask")o+=`<div class="think">Lázaro is checking the logbook<i></i><i></i><i></i></div>`;
   if(UI.err.advisor)o+=`<div class="err">${h(UI.err.advisor)}</div>`;
-  o+=S.briefs.map(b=>`<article class="memo"><button class="x" data-delbrief="${b.id}" aria-label="Remove this briefing">×</button><h3>${h(b.title)}</h3><div class="when">${when(b.at)}, at rank ${b.rank}</div>${md(b.text)}</article>`).join("");
+  o+=S.briefs.map(b=>`<article class="memo"><button class="x" data-delbrief="${b.id}" aria-label="Remove this briefing">×</button><h3>${h(b.title)}</h3><div class="when">${when(b.at)}, at rank ${b.rank}${b.model?", "+h(b.model):""}</div>${md(b.text)}</article>`).join("");
   if(!S.briefs.length&&C.key&&!UI.busy)o+=`<p class="note" style="margin-top:6px">Tick off what you have in Arsenal, Gear and Missions, then ask for orders. The more you log, the sharper the advice.</p>`;
   return o;
 }
@@ -707,7 +723,14 @@ async function testKey(){
     const list=(d.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>m.name.replace(/^models\//,""))
       .filter(n=>/^gemini/.test(n)&&!/(tts|image|live|embedding|audio|robotics|computer-use|vision)/.test(n));
     if(list.length){C.models=list;if(!list.includes(C.model))C.model=list.includes(DEFAULT_MODEL)?DEFAULT_MODEL:(list.find(n=>/flash/.test(n)&&!/lite|preview/.test(n))||list[0]);}
-    store(CKEY,C);sheetSettings("Connected. "+list.length+" models available.","ok");
+    store(CKEY,C);st.textContent="Key accepted. Checking which model answers...";
+    const probe=JSON.stringify({contents:[{role:"user",parts:[{text:"Reply with the single word OK."}]}]});
+    const chain=modelChain();let fails=[];
+    for(const m of chain){const r=await callModel(m,probe);
+      if(r.fatal){sheetSettings(r.fatal,"bad");return;}
+      if(r.text){C.model=m;store(CKEY,C);sheetSettings("Connected. "+m+" is answering."+(fails.length?" Skipped "+fails.join(", ")+".":""),"ok");return;}
+      fails.push(m+" (error "+r.status+")");}
+    sheetSettings("Key accepted, but no model answered: "+fails.join(", ")+". Gemini may be busy, try again in a minute.","bad");
   }catch(e){sheetSettings("Could not reach Gemini from here. Check your connection, or open the hosted page if this is a preview.","bad");}
 }
 
