@@ -805,6 +805,22 @@ $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")closeSheet();}
 
 render();
 if(!S.setup)sheetProfile();
+
+/* ===================== AUTO-UPDATE =====================
+   A home-screen app can sit in memory for days. When it comes back into view, ask the server
+   whether the page has changed and reload if so, unless you are in the middle of something. */
+let pageTag=null;
+async function serverTag(){try{const r=await fetch(location.pathname,{method:"HEAD",cache:"no-store"});return r.ok?(r.headers.get("etag")||r.headers.get("last-modified")):null;}catch(e){return null;}}
+async function checkUpdate(){
+  const t=await serverTag();if(!t)return;
+  if(pageTag===null){pageTag=t;return;}
+  if(t===pageTag)return;
+  const el=document.activeElement;
+  if(UI.busy||$("#scrim").classList.contains("show")||(el&&/INPUT|TEXTAREA|SELECT/.test(el.tagName)))return;
+  try{if(sessionStorage.getItem("yfk_reloaded")===t)return;sessionStorage.setItem("yfk_reloaded",t);}catch(e){}
+  location.reload();
+}
+if(/^http/.test(location.protocol)){checkUpdate();document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate();});}
 </script>
 </body>
 </html>
