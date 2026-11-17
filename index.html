@@ -635,7 +635,7 @@ function modelChain(){
 async function callModel(m,body){
   let res;
   try{res=await fetch(`${API}/${encodeURIComponent(m)}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":C.key},body});}
-  catch(e){return {fatal:"Could not reach Gemini. Check your connection. If you are looking at this inside a chat preview, AI calls are blocked there, so open the hosted page instead."};}
+  catch(e){return {status:0,net:String((e&&e.message)||e).slice(0,60)};}   // dropped connection: retried and rolled to the next model by gemini()
   let data={};try{data=await res.json();}catch(e){}
   const msg=((data.error&&data.error.message)||"").replace(/\s+/g," ").slice(0,160);
   if(!res.ok){
@@ -650,16 +650,18 @@ async function callModel(m,body){
 async function gemini(turns){
   if(!C.key)throw new Error("NOKEY");
   const body=JSON.stringify({systemInstruction:{parts:[{text:systemPrompt()}]},contents:turns.map(t=>({role:t.role,parts:[{text:t.text}]}))});
-  const chain=modelChain();let last="";
+  const chain=modelChain();let last="",net="";
   for(let i=0;i<chain.length;i++){
     const m=chain[i];
     let r=await callModel(m,body);
-    if(!r.text&&!r.fatal&&r.status>=500){await sleep(1500);r=await callModel(m,body);}   // busy servers often clear on a second try
+    if(!r.text&&!r.fatal&&(r.status===0||r.status>=500)){await sleep(1500);r=await callModel(m,body);}   // busy servers and dropped connections often clear on a second try
     if(r.fatal)throw new Error(r.fatal);
     if(r.text){UI.lastModel=m;if(i>0)toast(chain[0]+" was busy, so "+m+" answered");return r.text;}
+    if(r.status===0){net=r.net;last=m+" dropped the connection";continue;}
     last=m+" gave error "+r.status+(r.msg?" ("+r.msg+")":"");
     if(r.status===400)break;
   }
+  if(net&&!/error \d/.test(last))throw new Error("Could not reach Gemini ("+net+"). Check your signal or Wi-Fi and tap Send again. If this keeps happening, tap Test connection in Settings.");
   throw new Error("Gemini could not answer. "+last+". Wait a minute and try again, or pick a different model in Settings.");
 }
 const ORDERS={
