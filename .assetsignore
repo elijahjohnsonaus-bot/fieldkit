@@ -1,0 +1,8 @@
+# Everything in the top folder is uploaded as a public file unless it is listed here.
+.assetsignore
+.git
+.gitignore
+.wrangler
+node_modules
+wrangler.jsonc
+README.md
