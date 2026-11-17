@@ -130,7 +130,7 @@ h1{font-family:var(--stencil);font-weight:400;font-size:34px;line-height:.92;mar
 .btn.block{display:block;width:100%}
 
 /* memo cards (AI) */
-.memo{position:relative;background:var(--bone);color:var(--ink);padding:18px 16px 20px;margin:16px 0;font-family:var(--type);font-size:15px;line-height:1.5;
+.memo{position:relative;background:var(--bone);color:var(--ink);padding:18px 16px 20px;margin:16px 0;font-family:var(--body);font-size:15.5px;line-height:1.45;
   clip-path:polygon(0 0,100% 0,100% calc(100% - 6px),96% 100%,90% calc(100% - 5px),82% 100%,73% calc(100% - 6px),63% 100%,52% calc(100% - 4px),41% 100%,31% calc(100% - 6px),20% 100%,10% calc(100% - 4px),3% 100%,0 calc(100% - 5px))}
 .memo::before{content:"";position:absolute;top:-2px;left:50%;width:84px;height:20px;margin-left:-42px;background:rgba(247,201,15,.75);transform:rotate(-2deg)}
 .memo h3{font-family:var(--stencil);font-weight:400;font-size:19px;text-transform:uppercase;margin:4px 0 2px;color:var(--red)}
@@ -202,6 +202,55 @@ nav button[aria-current=page]{color:var(--yellow)}
 .toast{position:fixed;left:50%;bottom:calc(var(--tabh) + env(safe-area-inset-bottom) + 16px);transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--bone);border:1.500px solid var(--yellow);padding:10px 14px;border-radius:4px;font-size:14.500px;max-width:88vw;display:none}
 .toast.show{display:block}
 .foot{font-size:12.500px;color:rgba(244,236,216,.55);margin:26px 2px 0;line-height:1.4}
+
+/* loadout: the Arsenal screen */
+.lo-intro{font-size:14px;color:rgba(244,236,216,.8);margin:0 2px;line-height:1.4}
+.lo-h{display:flex;justify-content:space-between;align-items:baseline;margin:16px 2px 8px;font-family:var(--stencil);font-size:19px;text-transform:uppercase;color:var(--yellow)}
+.lo-h span{font-family:var(--cond);font-weight:700;font-size:14px;color:rgba(244,236,216,.7)}
+.lo-slot{display:block;width:100%;position:relative;margin-bottom:8px;padding:9px 30px 11px 12px;background:linear-gradient(180deg,rgba(22,16,14,.88),rgba(22,16,14,.74));border:1px solid rgba(244,236,216,.16);border-left:5px solid var(--yellow);border-radius:3px}
+.lo-slot::after{content:"";position:absolute;right:13px;top:50%;width:8px;height:8px;margin-top:-4px;border-right:2.5px solid rgba(244,236,216,.5);border-top:2.5px solid rgba(244,236,216,.5);transform:rotate(45deg)}
+.lo-sl{display:flex;flex-wrap:wrap;column-gap:8px;align-items:baseline;font-family:var(--cond);font-weight:700;font-size:12.5px;letter-spacing:1px;text-transform:uppercase;color:rgba(244,236,216,.58)}
+.lo-sl em{font-style:normal;font-weight:600;letter-spacing:.2px;text-transform:none;color:var(--kraft)}
+.lo-sn{display:block;font-family:var(--cond);font-weight:700;font-size:22px;line-height:1.08;color:var(--bone);margin-top:2px;overflow-wrap:anywhere}
+.lo-ss{display:block;font-size:13.5px;line-height:1.3;color:rgba(244,236,216,.66);margin-top:3px}
+.lo-slot.empty{background:rgba(0,0,0,.22);border:1.5px dashed rgba(244,236,216,.32);border-left:5px solid rgba(244,236,216,.32)}
+.lo-slot.empty .lo-sn{font-size:18px;font-weight:600;color:rgba(244,236,216,.5)}
+.lo-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.lo-am,.lo-tg{font-family:var(--cond);font-weight:700;font-size:12.5px;line-height:1.2;padding:3px 7px;border-radius:2px}
+.lo-tg{font-weight:600;border:1px solid rgba(244,236,216,.32);color:rgba(244,236,216,.88)}
+.lo-am{background:rgba(244,236,216,.22);color:var(--bone)}
+.lo-am.ap{background:var(--yellow);color:var(--ink)}
+.lo-am.st{background:var(--bone);color:var(--ink)}
+.lo-am.bl{background:#e57b2e;color:var(--ink)}
+.lo-am.po{background:#9cc23f;color:var(--ink)}
+.lo-am.in{background:#ff6a4d;color:var(--ink)}
+.lo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lo-grid .lo-slot{margin:0;min-height:78px;padding-right:24px}
+.lo-grid .lo-slot::after{right:10px}
+.lo-grid .lo-sn{font-size:17.5px;line-height:1.15}
+.lo-gad{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:9px}
+.lo-gad span{display:grid;place-items:center;text-align:center;min-height:40px;padding:4px 3px;border:1px solid rgba(244,236,216,.3);border-radius:3px;font-family:var(--cond);font-weight:700;font-size:12.5px;line-height:1.1;color:var(--bone);background:rgba(244,236,216,.06);overflow-wrap:anywhere}
+.lo-gad span.off{border-style:dashed;font-weight:600;color:rgba(244,236,216,.4);background:none}
+.lo-ask{display:grid;gap:8px;margin-top:18px}
+.lo-stale{font-family:var(--cond);font-weight:600;font-size:14.5px;color:var(--red);margin:0 0 8px}
+/* loadout pickers inside the sheet */
+.lo-grp{font-family:var(--cond);font-weight:700;font-size:14px;letter-spacing:.6px;text-transform:uppercase;color:var(--red);margin:16px 0 2px}
+.lo-sub{font-family:var(--cond);font-weight:700;font-size:15px;color:var(--ink);margin:18px 0 0;padding-top:10px;border-top:2px solid var(--ink)}
+.lo-pick{display:flex;width:100%;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px dashed #c3b296;min-height:50px}
+.lo-pick .txt{flex:1;min-width:0}
+.lo-pick b{display:block;font-weight:600;font-size:16px}
+.lo-pick small{display:block;font-size:13.5px;line-height:1.3;color:#5c4a3b;margin-top:1px}
+.lo-pick.cur{background:rgba(165,15,15,.08)}
+.lo-pick.cur b{color:var(--red)}
+.lo-k{flex:none;font-family:var(--cond);font-weight:700;font-size:12.5px;padding:2px 6px;border:1px solid #8c7a63;border-radius:3px;color:#4a3a2f}
+.lo-k.on{background:var(--red);border-color:var(--red);color:var(--bone)}
+.lo-bench{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 2px;padding:12px;background:var(--ink);color:var(--bone);border-left:5px solid var(--yellow);border-radius:3px}
+.lo-bench b{display:block;font-family:var(--cond);font-weight:700;font-size:22px;line-height:1.1}
+.lo-bench small{display:block;font-size:13.5px;line-height:1.3;color:rgba(244,236,216,.72);margin-top:2px}
+.sheet .lo-bench .btn.ghost{flex:none;padding:8px 12px;font-size:15px;color:var(--bone);border-color:rgba(244,236,216,.5)}
+.sheet .sock .chip{font-size:14.5px;padding:6px 10px}
+.sheet h3 small{font-family:var(--cond);font-weight:600;font-size:14px;color:#6b5a48;margin-left:8px}
+.sheet .lo-note{margin:12px 0 4px}
 @media (min-width:700px){h1{font-size:42px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -400,6 +449,35 @@ const REWARDS={
  "The Battle of Esperanza":["Revolutionary"]
 };
 
+/* ===================== LOADOUT DATA =====================
+   Follows the game's Arsenal screen: three primary slots (any weapon, and a Resolver weapon takes one of them),
+   a sidearm (pistols and auto-pistols), a Supremo with up to four gadgets and three mod sockets, five gear slots,
+   plus the amigo you have out. */
+const LO_W=[["p1","Primary 1"],["p2","Primary 2"],["p3","Primary 3"],["side","Sidearm"]];
+const LO_G=[["head","Head",0],["chest","Chest",1],["wrist","Wrist",2],["legs","Legs",3],["feet","Feet",4]];
+const LO_N={p1:"Primary 1",p2:"Primary 2",p3:"Primary 3",side:"Sidearm",sup:"Supremo",head:"Head",chest:"Chest",wrist:"Wrist",legs:"Legs",feet:"Feet",amigo:"Amigo"};
+const CATN={rifles:"Rifle",smgs:"SMG",lmgs:"LMG",snipers:"Sniper rifle",shotguns:"Shotgun",bows:"Bow",launchers:"Launcher",pistols:"Pistol",autopistols:"Auto-pistol"};
+/* workbench sockets by weapon type, named the way the workbench names them. Anything else goes in the free-text box */
+const AMMO_STD=["Standard Rounds","Soft-Target Rounds","Armor Piercing Rounds","Blast Rounds","Poison Rounds","Incendiary Rounds"];
+const AMMO_SG=["Shotgun Shells","Buckshot Rounds","Blast Shells","Poison Shells","Incendiary Shells"];
+const MUZ=["Compensator","Muzzle Brake","Resolver Suppressor","Resolver Suppressor MK.2","Russian Suppressor","American Suppressor","Large Cylindrical Suppressor","Large Rectangular Suppressor"];
+const OPT=["Resolver Reflex Sight","Red Dot Sight","Micro Reflex Sight","Reflex Sight","Resolver Reflex Sight MK. 2 (2x)","Specter Sight (2x)","Tactical Sight (3x)","ACOG (4x)","Resolver Acog Sight (4x)","Resolver Acog Sight MK. 2 (5x)","Folding Sight"];
+const PTR=["Laser Pointer","Resolver Laser Pointer MK. 2"];
+const MODS=["Gut-Wrencher","Trigger Discipline","Nimble Shooter","Gunslinger","Fast Reload","Extended Mag","Fresh Clip","High Ground","Press Your Advantage","Magic Fingers","Reload All","Headshot Supremo","Vampiric Triada","Keep It Cool"];
+const SOCK={
+ rifles:{ammo:AMMO_STD,muzzle:MUZ,optic:OPT,pointer:PTR,mods:MODS},
+ smgs:{ammo:AMMO_STD,muzzle:MUZ,optic:OPT,pointer:PTR,mods:MODS},
+ lmgs:{ammo:AMMO_STD,muzzle:MUZ,optic:OPT,pointer:PTR,mods:MODS},
+ snipers:{ammo:AMMO_STD,muzzle:MUZ,optic:["Tactical Sight (3x)","ACOG (4x)","Enhanced Scope (3x-6x)","Sniper Scope"],pointer:PTR,mods:MODS},
+ shotguns:{ammo:AMMO_SG,muzzle:["X-Large Classic Suppressor"],optic:["Resolver Reflex Sight","Micro Reflex Sight"],pointer:PTR,mods:MODS},
+ pistols:{ammo:AMMO_STD,muzzle:["Pistol Suppressor"],pointer:PTR,mods:MODS},
+ autopistols:{ammo:AMMO_STD,muzzle:["Pistol Suppressor"],pointer:PTR,mods:MODS},
+ bows:{optic:["Crosshair Sight"],mods:["Precision Arrows","Gunslinger","High Ground","Headshot Supremo"]},
+ launchers:null
+};
+const GADGETS=["Molotov","Grenade","Sticky Grenade","EMP Grenade","Sticky EMP Grenade","Flash Grenade","Poison Grenade","Perception Grenade","Smoke Grenade","Dynamite","Pipe Bomb","Fuel Canister","Throwing Knife","Throwing Axe","Baseball","Big Game Bait","C4","Remote EMP Charge","Proximity Explosive","Flame Proximity Charge","EMP Proximity Charge","Poison Proximity Charge","Claymore","Auto Turret","Healing Syringe","Healing Canister"];
+const SUP_SPECIAL={"Exterminador":"Artillery Supremacy","Volta":"Signal Boost"};
+
 /* ===================== INDEX ===================== */
 const slug=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const BYNAME={};           // item name -> id (or list of ids for sets)
@@ -422,6 +500,14 @@ TOTAL+=RES.length+SUP.length+GSING.length+AMI.length+GSETS.filter(s=>!s.x).reduc
 /* everything that counts towards the progress bar */
 const BASE=new Set([].concat(...WEAPONS.map(c=>c.items.filter(i=>!i.x).map(i=>i.id)),RES.map(x=>x.id),SUP.map(x=>x.id),GSING.map(x=>x.id),AMI.map(x=>x.id),...GSETS.filter(s=>!s.x).map(s=>s.pieces.map(p=>p.id))));
 const opId=n=>"m:"+slug(n), stId=n=>"y:"+slug(n);
+/* id -> item, used by the loadout */
+const BYID={};
+WEAPONS.forEach(c=>c.items.forEach(i=>BYID[i.id]=Object.assign({t:"w",cat:c.id},i)));
+RES.forEach(x=>BYID[x.id]=Object.assign({t:"r"},x));
+SUP.forEach(x=>BYID[x.id]=Object.assign({t:"s"},x));
+GSETS.forEach(s=>s.pieces.forEach(p=>BYID[p.id]=Object.assign({t:"g",set:s},p)));
+GSING.forEach(x=>BYID[x.id]=Object.assign({t:"g1",slot:SLOTS.indexOf(x.note.split(".")[0])},x));
+AMI.forEach(x=>BYID[x.id]=Object.assign({t:"a"},x));
 
 /* ===================== STATE ===================== */
 const SKEY="yfk_state_v1", CKEY="yfk_settings_v1";
@@ -430,14 +516,15 @@ const API="https://generativelanguage.googleapis.com/v1beta/models";
 let storageOK=true;
 function load(k,def){try{const v=localStorage.getItem(k);return v?Object.assign(def,JSON.parse(v)):def;}catch(e){storageOK=false;return def;}}
 function store(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){storageOK=false;}}
-const fresh=()=>({rank:1,region:"isla",style:"",setup:false,have:{"w:pmm":1},fac:{},done:{},custom:[],todo:[],briefs:[],chat:[]});
+const fresh=()=>({rank:1,region:"isla",style:"",setup:false,have:{"w:pmm":1},fac:{},done:{},custom:[],todo:[],briefs:[],chat:[],loadout:{}});
 let S=load(SKEY,fresh());
 let C=load(CKEY,{key:"",model:DEFAULT_MODEL,models:[]});
 const save=()=>store(SKEY,S);
 /* the Triada pieces used to be one-off entries; carry any ticks over to the Triada set */
 (function(){const M={"g1:ida-s-sigil":"g:triada:0","g1:oluwa-s-heart":"g:triada:1","g1:eternal-dance":"g:triada:2","g1:oku-s-deliverance":"g:triada:3","g1:mimo-abosi-s-mirage":"g:triada:4"};let ch=false;
   Object.keys(M).forEach(k=>{if(S.have[k]){S.have[M[k]]=1;delete S.have[k];ch=true;}});if(ch)save();})();
-const UI={tab:"arsenal",seg:{arsenal:"weapons",gear:"sets",missions:"ops"},q:"",filter:"all",open:{},busy:false,err:{advisor:"",ask:""}};
+if(!S.loadout||typeof S.loadout!=="object")S.loadout={};
+const UI={tab:"arsenal",seg:{arsenal:"loadout",gear:"sets",missions:"ops"},q:"",filter:"all",open:{},busy:false,err:{advisor:"",ask:"",loadout:""},pick:null};
 try{const h=location.hash.slice(1);if(["arsenal","gear","missions","advisor","ask"].includes(h))UI.tab=h;}catch(e){}
 
 /* ===================== HELPERS ===================== */
@@ -505,6 +592,7 @@ function rankRow(x){const locked=x.rank>S.rank&&!has(x.id);
   return row(x.id,x.n,x.what+". "+x.how+(x.rank?`. Needs rank ${x.rank}`:""),has(x.id),locked?`<span class="tag lock">Rank ${x.rank}</span>`:"");}
 function listArsenal(){
   const seg=UI.seg.arsenal;let out="";
+  if(seg==="loadout")return loBoard();
   if(seg==="weapons"){
     WEAPONS.forEach((c,i)=>{
       const vis=c.items.filter(it=>match(it.n,it.note,c.n)&&pass(has(it.id)));
@@ -569,6 +657,190 @@ function listMissions(){
   return (UI.q?"":`<p class="note">${seg==="ops"?"Main operations. Regions other than yours stay folded so names are not spoiled. Order inside a region is a guide only.":"Side stories. Several of them unlock amigos and gear."}</p>`)+(out||none());
 }
 
+/* ===================== LOADOUT ===================== */
+const isW=k=>k==="p1"||k==="p2"||k==="p3"||k==="side";
+function itemOf(id){
+  if(!id)return null;
+  if(BYID[id])return BYID[id];
+  const c=S.custom.find(x=>x.id===id);
+  return c?{id:c.id,n:c.n,t:c.kind==="weapon"?"xw":"xg",custom:true}:null;
+}
+function kindOf(it){
+  if(!it)return "";
+  if(it.t==="w")return CATN[it.cat]+(it.u?", unique":it.x?", bonus":"");
+  if(it.t==="r")return "Resolver weapon";
+  if(it.t==="s")return "Supremo";
+  if(it.t==="g")return it.set.n+" set"+(AKA[it.set.n]?", called "+AKA[it.set.n]+" in game":"");
+  if(it.t==="g1")return "One-off piece";
+  if(it.t==="a")return "Amigo";
+  return "Added by you";
+}
+const sockFor=it=>it&&it.t==="w"&&!it.u?SOCK[it.cat]||null:null;
+const canSide=it=>!!it&&((it.t==="w"&&(it.cat==="pistols"||it.cat==="autopistols"))||it.t==="xw");
+const ammoCls=a=>/Armor Piercing/.test(a)?"ap":/Soft-Target|Buckshot/.test(a)?"st":/Blast/.test(a)?"bl":/Poison/.test(a)?"po":/Incendiary/.test(a)?"in":"";
+const loSig=()=>JSON.stringify(S.loadout||{});
+const loW=k=>{const w=S.loadout[k];return w&&itemOf(w.id)?w:null;};
+const loSup=()=>{const s=S.loadout.sup;return s&&itemOf(s.id)?s:null;};
+function loCount(){const L=S.loadout;return LO_W.filter(([k])=>loW(k)).length+(loSup()?1:0)+LO_G.filter(([k])=>itemOf(L[k])).length+(itemOf(L.amigo)?1:0);}
+
+function loBoard(){
+  const L=S.loadout,nW=LO_W.filter(([k])=>loW(k)).length,nG=LO_G.filter(([k])=>itemOf(L[k])).length;
+  const wCard=([k,lab])=>{
+    const w=loW(k);
+    if(!w)return `<button class="lo-slot empty" data-lo="${k}"><span class="lo-sl">${lab}</span><span class="lo-sn">Empty</span><span class="lo-ss">${k==="side"?"Tap to equip a pistol or auto-pistol":"Tap to equip a weapon"}</span></button>`;
+    const it=itemOf(w.id),tags=[];
+    if(w.ammo)tags.push(`<span class="lo-am ${ammoCls(w.ammo)}">${h(w.ammo)}</span>`);
+    [w.muzzle,w.optic,w.pointer].concat(w.mods||[],w.note?[w.note]:[]).forEach(x=>{if(x)tags.push(`<span class="lo-tg">${h(x)}</span>`);});
+    const hint=it.u?"Unique, so its mods are fixed":sockFor(it)?"Tap to log ammo, attachments and mods":"Tap to add what's fitted";
+    return `<button class="lo-slot" data-lo="${k}"><span class="lo-sl">${lab}<em>${h(kindOf(it))}</em></span><span class="lo-sn">${h(it.n)}</span>${tags.length?`<span class="lo-tags">${tags.join("")}</span>`:`<span class="lo-ss">${hint}</span>`}</button>`;
+  };
+  const sp=loSup(),si=sp&&itemOf(sp.id);
+  const gad=[0,1,2,3].map(i=>{const g=sp&&(sp.gadgets||[])[i];return g?`<span>${h(g)}</span>`:`<span class="off">Gadget ${i+1}</span>`;}).join("");
+  const sockT=sp?[sp.s1,sp.s2,sp.s3].filter(Boolean).map(x=>`<span class="lo-tg">${h(x)}</span>`).join(""):"";
+  const gCard=(k,lab)=>{const it=itemOf(L[k]);
+    const sub=!it?"":it.t==="g"?it.set.n+(AKA[it.set.n]?" / "+AKA[it.set.n]:""):it.t==="a"?it.what.split(".")[0]:kindOf(it);
+    return `<button class="lo-slot ${it?"":"empty"}" data-lo="${k}"><span class="lo-sl">${lab}</span><span class="lo-sn">${it?h(it.n):"Empty"}</span>${sub?`<span class="lo-ss">${h(sub)}</span>`:""}</button>`;};
+  let o=`<p class="lo-intro">Set this to match the Arsenal screen in your game. Tap a slot to equip it.</p>`;
+  o+=`<div class="lo-h">Weapons<span>${nW}/4</span></div>`+LO_W.map(wCard).join("");
+  o+=`<div class="lo-h">Supremo</div><button class="lo-slot ${si?"":"empty"}" data-lo="sup"><span class="lo-sl">Backpack</span><span class="lo-sn">${si?h(si.n):"Empty"}</span>${si?"":`<span class="lo-ss">Tap to equip a Supremo and its gadgets</span>`}<span class="lo-gad">${gad}</span>${sockT?`<span class="lo-tags">${sockT}</span>`:""}</button>`;
+  o+=`<div class="lo-h">Gear<span>${nG}/5</span></div><div class="lo-grid">${LO_G.map(([k,lab])=>gCard(k,lab)).join("")}${gCard("amigo","Amigo")}</div>`;
+  const busy=UI.busy,last=S.briefs.find(b=>b.kind==="loadout");
+  o+=`<div class="lo-ask"><input class="search" type="text" id="loJob" maxlength="80" autocomplete="off" placeholder="Next job (optional), e.g. FND base, tank convoy" aria-label="Next job" value="${h(L.job||"")}"><button class="btn block" data-order="loadout" ${busy||!C.key?"disabled":""}>What should I change?</button></div>`;
+  if(!C.key)o+=needKey();
+  if(busy==="loadout")o+=`<div class="think">Checking your loadout<i></i><i></i><i></i></div>`;
+  if(UI.err.loadout)o+=`<div class="err">${h(UI.err.loadout)}</div>`;
+  if(last&&busy!=="loadout")o+=`<article class="memo"><button class="x" data-delbrief="${last.id}" aria-label="Remove this check">×</button><h3>${h(last.title)}</h3><div class="when">${when(last.at)}${last.model?", "+h(last.model):""}</div>${last.sig&&last.sig!==loSig()?`<p class="lo-stale">Loadout changed since this check. Tap the button again for a fresh one.</p>`:""}${md(last.text)}</article>`;
+  return o;
+}
+
+/* what can go in a slot, as groups of {id,n,sub,rank} */
+function loPool(k){
+  const G=[],sub=(...a)=>a.filter(Boolean).join(". ");
+  if(isW(k)){
+    const pis=WEAPONS.filter(c=>c.id==="pistols"||c.id==="autopistols");
+    const cats=k==="side"?pis:WEAPONS.filter(c=>!pis.includes(c)).concat(pis);
+    cats.forEach(c=>G.push({g:c.n,items:c.items.map(i=>({id:i.id,n:i.n,sub:sub(i.u?"Unique":i.x?"Bonus":"",i.note)}))}));
+    if(k!=="side")G.push({g:"Resolver weapons",items:RES.map(x=>({id:x.id,n:x.n,sub:sub(x.what,x.how),rank:x.rank}))});
+  }else if(k==="sup")G.push({g:"Supremos",items:SUP.map(x=>({id:x.id,n:x.n,sub:sub(x.what,x.how),rank:x.rank}))});
+  else if(k==="amigo")G.push({g:"Amigos",items:AMI.map(x=>({id:x.id,n:x.n,sub:sub(x.what,x.how)}))});
+  else{
+    const s=LO_G.find(([x])=>x===k)[2],base=[],extra=[];
+    GSETS.forEach(st=>st.pieces.filter(p=>p.slot===s).forEach(p=>(st.x?extra:base).push({id:p.id,n:p.n,sub:sub(st.n+" set"+(AKA[st.n]?" ("+AKA[st.n]+")":""),st.what)})));
+    G.push({g:"Gear sets",items:base});
+    G.push({g:"One-off pieces",items:GSING.filter(x=>BYID[x.id].slot===s).map(x=>({id:x.id,n:x.n,sub:x.note}))});
+    G.push({g:"Bonus and DLC sets",items:extra});
+  }
+  const kind=isW(k)?"weapon":LO_G.some(([x])=>x===k)?"gear":"";
+  if(kind)G.push({g:"Added by you",items:S.custom.filter(c=>c.kind===kind).map(c=>({id:c.id,n:c.n,sub:"Added by you"}))});
+  return G.filter(g=>g.items.length);
+}
+function pickList(){
+  const P=UI.pick,k=P.slot,L=S.loadout,q=(P.q||"").trim().toLowerCase();
+  const cur=isW(k)?(L[k]&&L[k].id):k==="sup"?(L.sup&&L.sup.id):L[k];
+  const where=id=>{if(!isW(k))return "";const o=LO_W.find(([x])=>x!==k&&L[x]&&L[x].id===id);return o?o[1]:"";};
+  const groups=loPool(k),fit=i=>!q||(i.n+" "+i.sub).toLowerCase().includes(q);
+  const row=i=>{const on=i.id===cur,w=where(i.id),lock=i.rank&&i.rank>S.rank&&!has(i.id);
+    return `<button class="lo-pick ${on?"cur":""}" data-lopick="${h(i.id)}"><span class="txt"><b>${h(i.n)}</b>${i.sub?`<small>${h(i.sub)}</small>`:""}</span>${on?`<span class="lo-k on">Equipped</span>`:w?`<span class="lo-k">In ${h(w)}</span>`:lock?`<span class="lo-k">Rank ${i.rank}</span>`:""}</button>`;};
+  const sect=own=>groups.map(g=>{const its=g.items.filter(i=>has(i.id)===own&&fit(i));return its.length?`<div class="lo-grp">${h(g.g)}</div>`+its.map(row).join(""):"";}).join("");
+  const owned=sect(true),restN=groups.reduce((a,g)=>a+g.items.filter(i=>!has(i.id)).length,0);
+  if(q){const rest=sect(false);
+    if(!owned&&!rest)return `<p class="lo-note">Nothing matches.</p>`;
+    return owned+(rest?`<div class="lo-sub">Not ticked yet. Picking one ticks it as unlocked.</div>`+rest:"");}
+  let o=owned||`<p class="lo-note">Nothing ticked as unlocked for this slot yet. Open the full list below.</p>`;
+  if(restN){o+=`<button class="btn ghost block" style="margin-top:14px" data-loall="1">${P.all?"Hide":"Show"} the ${restN} you haven't ticked</button>`;
+    if(P.all)o+=`<div class="lo-sub">Not ticked yet. Picking one ticks it as unlocked.</div>`+sect(false);}
+  return o;
+}
+const sheetTop=k=>`<div class="sheet-top"><h2>${h(LO_N[k])}</h2><button class="iconbtn" data-act="close" aria-label="Close">×</button></div>`;
+function sheetChoose(){
+  const k=UI.pick.slot,L=S.loadout,filled=isW(k)?loW(k):k==="sup"?loSup():itemOf(L[k]);
+  const lead=k==="side"?"Pistols and auto-pistols.":isW(k)?"Any weapon. A Resolver weapon takes one of your three primary slots.":k==="sup"?"Pick the backpack, then its gadgets.":k==="amigo"?"The amigo you have out.":"Gear for this slot.";
+  return sheetTop(k)+`<p>${lead} The ones you've ticked as unlocked are listed first.</p>
+  <input type="text" id="pickQ" placeholder="Search" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search" value="${h(UI.pick.q||"")}">
+  <div id="pickList">${pickList()}</div>
+  <div class="rowbtns" style="margin-top:18px">${filled&&(isW(k)||k==="sup")?`<button class="btn dark" data-loview="bench">Back</button>`:`<button class="btn dark" data-act="close">Close</button>`}${filled?`<button class="btn ghost" data-loclear="1">Empty this slot</button>`:""}</div>`;
+}
+function sheetBench(){
+  const k=UI.pick.slot,w=loW(k),it=itemOf(w.id),so=sockFor(it);
+  const chips=(key,opts,none)=>`<div class="chips sock">${none?`<button class="chip" data-losock="${key}" data-val="" aria-pressed="${!w[key]}">${none}</button>`:""}${opts.map(x=>`<button class="chip" data-losock="${key}" data-val="${h(x)}" aria-pressed="${w[key]===x}">${h(x)}</button>`).join("")}</div>`;
+  let o=sheetTop(k)+`<div class="lo-bench"><div><b>${h(it.n)}</b><small>${h(kindOf(it))}</small></div><button class="btn ghost" data-loview="choose">Change</button></div>`;
+  if(it.u)o+=`<p class="lo-note">Unique weapons come with fixed mods, so there's nothing to set here.</p>`;
+  else if(it.t==="r")o+=`<p class="lo-note">Resolver weapons have their own upgrades. Type what you've fitted below.</p>`;
+  else if(!so)o+=`<p class="lo-note">Type what's fitted below.</p>`;
+  if(so){
+    if(so.ammo)o+=`<h3>Ammo socket</h3>`+chips("ammo",so.ammo,"");
+    if(so.muzzle)o+=`<h3>Muzzle socket</h3>`+chips("muzzle",so.muzzle,"None");
+    if(so.optic)o+=`<h3>Optical socket</h3>`+chips("optic",so.optic,"Ironsights");
+    if(so.pointer)o+=`<h3>Pointer socket</h3>`+chips("pointer",so.pointer,"None");
+    if(so.mods){const m=w.mods||[];o+=`<h3>Mod sockets<small>${m.length}/3</small></h3><div class="chips sock">${so.mods.map(x=>`<button class="chip" data-lomod="${h(x)}" aria-pressed="${m.includes(x)}">${h(x)}</button>`).join("")}</div>`;}
+  }
+  o+=`<label for="loNote">${so?"Anything not listed":it.u?"Notes":"What's fitted"}</label><input type="text" id="loNote" maxlength="80" autocomplete="off" value="${h(w.note||"")}" placeholder="${so?"e.g. a mod or attachment not shown above":"Optional"}">
+  <div class="rowbtns" style="margin-top:18px"><button class="btn dark" data-act="close">Done</button><button class="btn ghost" data-loclear="1">Empty this slot</button></div>`;
+  return o;
+}
+function sheetSupBench(){
+  const sp=loSup(),it=itemOf(sp.id),g=sp.gadgets||[];
+  return sheetTop("sup")+`<div class="lo-bench"><div><b>${h(it.n)}</b><small>${h(it.what)}</small></div><button class="btn ghost" data-loview="choose">Change</button></div>
+  <h3>Gadgets<small>${g.length}/4</small></h3>
+  <div class="chips sock">${GADGETS.map(x=>`<button class="chip" data-logad="${h(x)}" aria-pressed="${g.includes(x)}">${h(x)}</button>`).join("")}</div>
+  <h3>Supremo mods</h3>
+  <label for="supS1">Supremo socket</label><input type="text" id="supS1" maxlength="40" autocomplete="off" value="${h(sp.s1||"")}" placeholder="e.g. Stealth Material">
+  <label for="supS2">Charger socket</label><input type="text" id="supS2" maxlength="40" autocomplete="off" value="${h(sp.s2||"")}" placeholder="e.g. Sharpshooter">
+  <label for="supS3">Special upgrade socket</label><input type="text" id="supS3" maxlength="40" autocomplete="off" value="${h(sp.s3||"")}" placeholder="${h(SUP_SPECIAL[it.n]?"e.g. "+SUP_SPECIAL[it.n]:"The upgrade only this Supremo has")}">
+  <div class="rowbtns" style="margin-top:18px"><button class="btn dark" data-act="close">Done</button><button class="btn ghost" data-loclear="1">Empty this slot</button></div>`;
+}
+function sheetLo(top){
+  const P=UI.pick,k=P.slot;
+  openSheet(P.view==="bench"&&isW(k)&&loW(k)?sheetBench():P.view==="bench"&&k==="sup"&&loSup()?sheetSupBench():sheetChoose());
+  if(top)$("#sheet").scrollTop=0;
+}
+function loOpen(k){
+  UI.pick={slot:k,view:(isW(k)&&loW(k))||(k==="sup"&&loSup())?"bench":"choose",q:"",all:false};
+  sheetLo(true);
+}
+function loPick(id){
+  const P=UI.pick,k=P.slot,L=S.loadout,it=itemOf(id);if(!it)return;
+  let added="";
+  if(!has(id)){S.have[id]=1;added=it.n;}
+  if(isW(k)){
+    const prev=loW(k);
+    if(!prev||prev.id!==id){
+      const other=LO_W.map(([x])=>x).find(x=>x!==k&&L[x]&&L[x].id===id);
+      const cfg=other?L[other]:{id,ammo:"",muzzle:"",optic:"",pointer:"",mods:[],note:""};
+      if(other){if(prev&&(other!=="side"||canSide(itemOf(prev.id))))L[other]=prev;else delete L[other];}
+      L[k]=cfg;
+    }
+    P.view="bench";P.q="";
+  }else if(k==="sup"){L.sup=Object.assign({gadgets:[],s1:"",s2:"",s3:""},L.sup||{},{id});P.view="bench";P.q="";}
+  else{L[k]=id;save();closeSheet();toast(added?it.n+" equipped and ticked as unlocked":it.n+" equipped");return;}
+  save();if(added)toast(added+" ticked as unlocked");
+  sheetLo(true);
+}
+/* the loadout as plain lines for the AI */
+function loText(){
+  const L=S.loadout,out=[];
+  if(!loCount())return "Not entered yet."+(L.job?"\nNext job: "+L.job:"");
+  LO_W.forEach(([k,lab])=>{const w=loW(k);
+    if(!w){out.push(lab+": empty");return;}
+    const it=itemOf(w.id),so=sockFor(it),p=[];
+    if(so){
+      if(so.ammo)p.push("ammo "+(w.ammo||"not logged"));
+      if(so.muzzle)p.push("muzzle "+(w.muzzle||"none"));
+      if(so.optic)p.push("optic "+(w.optic||"ironsights"));
+      if(so.pointer)p.push("pointer "+(w.pointer||"none"));
+      if(so.mods)p.push("mods "+((w.mods||[]).join(", ")||"none"));
+    }
+    if(w.note)p.push("also: "+w.note);
+    out.push(`${lab}: ${it.n} (${kindOf(it)}${it.u?", fixed mods":""})${p.length?". "+p.join("; "):""}`);
+  });
+  const sp=loSup();
+  out.push(sp?`Supremo: ${itemOf(sp.id).n}. Gadgets: ${(sp.gadgets||[]).join(", ")||"none"}. Supremo socket: ${sp.s1||"not logged"}. Charger socket: ${sp.s2||"not logged"}. Special upgrade socket: ${sp.s3||"not logged"}`:"Supremo: empty");
+  LO_G.forEach(([k,lab])=>{const it=itemOf(L[k]);out.push(lab+": "+(it?it.n+" ("+kindOf(it)+")":"empty"));});
+  const a=itemOf(L.amigo);out.push("Amigo: "+(a?a.n:"none"));
+  if(L.job)out.push("Next job: "+L.job);
+  return out.join("\n");
+}
+
 /* ===================== AI ===================== */
 function namesOf(list){return list.filter(x=>has(x.id)).map(x=>x.n);}
 function logbook(){
@@ -602,24 +874,36 @@ function fieldNotes(){
   N.push("Camp facility tiers: "+FAC.map(f=>`${f.n}: Built = ${f.t[0]}; Enhanced = ${f.t[1]}; Perfected = ${f.t[2]}`).join(" | ")+". Each of the three main camps holds two facilities.");
   N.push("Amigo sources: "+AMI.map(a=>`${a.n}: ${a.how}`).join(" | "));
   N.push("Gear sets (piece family, then the set name the game shows): "+GSETS.filter(s=>!s.x).map(s=>`${s.n}${AKA[s.n]?" / "+AKA[s.n]+" set":""}: ${s.what}${s.how?" ("+s.how+")":""}`).join(" | "));
-  N.push("Bonus weapons and gear from paid packs, rewards and Lola's Black Market also exist. Only bring those up if the logbook shows Dani owns them.");
+  N.push("Bonus weapons and gear from paid packs, rewards and Lola's Black Market also exist. Only bring those up if the logbook shows the player owns them.");
+  N.push("Loadout rules: three primary weapon slots take any weapon, and a Resolver weapon has to use one of them. The sidearm slot takes pistols and auto-pistols. One Supremo with up to four gadgets plus a Supremo socket, a charger socket and a special upgrade socket. Five gear slots: head, chest, wrist, legs, feet. One amigo out at a time. Unique weapons have fixed mods that cannot be changed.");
   return N.join("\n");
 }
 function systemPrompt(){
-  return `You are Tío Lázaro, a veteran Libertad quartermaster in Yara, mentoring the player through the game Far Cry 6. Address the player as Dani.
+  return `You are the advice engine in a Far Cry 6 companion app. The player reads your reply on their phone mid-game.
 
-VOICE: Warm, dry-humoured old guerrilla. Plain English with light Yaran flavour: resolver, guerrilla, compañero, FND, Libertad, Clara, Juan, Supremo, amigo. A phrase or two of Spanish per reply at most. No stage directions, no asterisk actions.
+HOW TO ANSWER
+- Dot points only. No intro, greeting, sign-off or wrap-up.
+- Each point is one concrete thing to do, equip, buy or build, or a fact they asked for. Start with the action.
+- Bold item, mission and place names.
+- Keep it tight: 8 points or fewer unless the request asks for more.
+- Plain, direct English with Australian spelling. No character, roleplay, slang, Spanish or jokes. No em dashes. Use the game's own item names.
+- Only use short headings when the request asks for them. No tables.
 
-FORMAT: Dani reads this on a phone mid-game. Lead with the answer. Stay under about 160 words unless asked for more detail or a full briefing. Use short bullets and bold the names of weapons, mods, missions and places. No tables.
+WHAT YOU KNOW
+- LOGBOOK is what the player has unlocked and done. Trust it.
+- CURRENT LOADOUT is exactly what they have equipped right now. Anything equipped counts as owned.
+- Recommend things they own. If something they don't own is clearly better, say exactly where to get it and check its rank against theirs.
+- Use FIELD NOTES for how-to-get facts, otherwise your own knowledge of Far Cry 6. If you're not sure of an exact location, cost or number, say "not sure" instead of guessing.
 
-GROUNDING: The LOGBOOK is what Dani has actually logged, so trust it over assumptions. Build loadouts only from what the logbook shows as owned. When you suggest something Dani does not own yet, say how to get it and check the rank requirement against Dani's rank. Use the FIELD NOTES for how-to-get facts. For anything else use your own knowledge of Far Cry 6. If you are not sure of an exact location, cost or number, say so plainly instead of guessing.
+SPOILERS: weapon, gear and location spoilers are fine. Never reveal story events, twists, character fates or endings, and don't describe what happens in missions they haven't done. Refer to missions by name only.
 
-SPOILERS: Weapon, gear and location spoilers are fine. Never reveal story events, twists, character fates or endings, and do not describe what happens in missions Dani has not completed. Refer to missions by name only.
-
-Stay on Far Cry 6. If asked about anything else, steer back in one line.
+If asked about anything that isn't Far Cry 6, say in one line that you only cover Far Cry 6.
 
 LOGBOOK
 ${logbook()}
+
+CURRENT LOADOUT
+${loText()}
 
 FIELD NOTES
 ${fieldNotes()}`;
@@ -665,18 +949,19 @@ async function gemini(turns){
   throw new Error("Gemini could not answer. "+last+". Wait a minute and try again, or pick a different model in Settings.");
 }
 const ORDERS={
- next:["What should I do next?","Based on my logbook, what should I tackle next? Give me the single best next mission or activity and two back-ups, with one line each on why it suits my rank and kit. Finish with one line on the best weapon or piece of gear to buy or pick up before I go."],
- buy:["What should I buy next?","Give me a shopping list from what I do not own yet. Up to three weapons (include any Resolver weapon or Supremo I can buy at my rank) and up to three gear pieces or sets that suit how I play. For each one say where to get it, what it costs if you know (pesos, depleted uranium, or a place to find it), and what it replaces in my current kit. Check my camp facilities first: if the Guerrilla Garrison or Bandidos Barracks is not built, say that comes first. Put them in the order I should get them."],
- mods:["Which mods should I build?","Looking at the weapons I own, which workbench mods and ammo types should I build next? Name the weapon, the mod and what it fixes, and tell me what to save materials for."],
- camp:["Which camp build comes first?","Which camp facility should I build or upgrade next, and why, given what I have built so far? Give me the order for my next three builds."],
- full:["Full briefing","Give me a full briefing in about 350 words with these headings: Next mission; Loadout to run now (weapons, Supremo, Resolver weapon, amigo and gear, only from what I own); Buy or grab next (two or three weapons, any Resolver weapon or Supremo I can afford at my rank, and two or three gear pieces, each with where to get it and what it replaces); Workbench; Camp."]
+ next:["What should I do next?","What should I do next? First point: the single best mission or activity and where it is. Then two back-ups. Last point: one thing to grab or equip before I go. One line each."],
+ buy:["What should I buy next?","What should I buy or pick up next? Up to three weapons (including any Resolver weapon or Supremo I can get at my rank) and up to three gear pieces that suit how I play, in the order to get them. One point each: the item, where to get it, the cost if you know it, and which loadout slot it goes in or replaces. If my Guerrilla Garrison or Bandidos Barracks isn't built, make building it the first point."],
+ mods:["Which mods should I build?","Which workbench mods and ammo should I build next for the weapons in my current loadout (or my owned weapons if no loadout is entered)? One point each: weapon, mod or ammo, what it fixes. Last point: which materials to save."],
+ camp:["Which camp build comes first?","Which camp facilities should I build or upgrade next? My next three builds in order, one point each with the reason in a few words."],
+ full:["Full briefing","Full briefing. Short headings with dot points under each: Next mission; Loadout changes; Buy or grab next; Workbench; Camp. About 200 words, actions only."],
+ loadout:["Loadout check","Check my CURRENT LOADOUT and tell me exactly what to change. One point per change, written as 'Slot: what to do', e.g. 'Primary 2: switch the ammo to **Armor Piercing Rounds**'. Use things I own. Only name something I don't own if nothing I own fits, and say where to get it. Fill any empty slot. Make sure my three primaries cover unarmoured soldiers, armoured soldiers and vehicles between them, that my muzzles and gear suit how I play, and that my Supremo gadgets back up my weapons. If a next job is given, set me up for that. Leave out slots that are already right, then finish with one point starting 'Keep:' that lists them. If nothing needs changing, say that in one point."]
 };
 const QUICK=["How do I get gunpowder?","Where do I find depleted uranium?","How do I get Supremo-Bond?","What beats tanks early on?","Best ammo against armoured soldiers?","How do I earn pesos fast?"];
 async function runOrder(k){
-  if(UI.busy)return;UI.busy=k;UI.err.advisor="";render();
+  if(UI.busy||!ORDERS[k])return;const ek=k==="loadout"?"loadout":"advisor";UI.busy=k;UI.err[ek]="";render();
   try{const text=await gemini([{role:"user",text:ORDERS[k][1]}]);
-    S.briefs.unshift({id:Date.now(),title:ORDERS[k][0],text,at:Date.now(),rank:S.rank,model:UI.lastModel||""});S.briefs=S.briefs.slice(0,8);save();
-  }catch(e){UI.err.advisor=e.message==="NOKEY"?"":e.message;}
+    S.briefs.unshift({id:Date.now(),kind:k,title:ORDERS[k][0],text,at:Date.now(),rank:S.rank,model:UI.lastModel||"",sig:k==="loadout"?loSig():""});S.briefs=S.briefs.slice(0,8);save();
+  }catch(e){UI.err[ek]=e.message==="NOKEY"?"":e.message;}
   UI.busy=false;render();
 }
 async function sendAsk(q){
@@ -688,24 +973,24 @@ async function sendAsk(q){
   }catch(e){UI.err.ask=e.message==="NOKEY"?"":e.message;if(S.chat.length&&S.chat[S.chat.length-1].role==="user"){UI.draft=S.chat.pop().text;save();}}
   UI.busy=false;render();window.scrollTo(0,document.body.scrollHeight);
 }
-const needKey=()=>`<div class="callout"><b>Tío Lázaro needs a radio.</b><br>Add your Gemini API key in Settings to switch on the Advisor and Ask tabs. It is saved in this browser only.<br><button class="btn" data-act="settings">Open Settings</button></div>`;
+const needKey=()=>`<div class="callout"><b>Add your Gemini API key to switch on the AI.</b><br>It's saved in this browser only.<br><button class="btn" data-act="settings">Open Settings</button></div>`;
 function viewAdvisor(){
-  let o=`<p class="lead">Tío Lázaro reads your logbook first: rank ${S.rank}, ${h(regionName(S.region))}, ${countHave()} unlocks and ${Object.keys(S.done).filter(k=>S.done[k]&&!k.startsWith("t:")).length} missions ticked.</p>`;
+  let o=`<p class="lead">Uses your logbook: rank ${S.rank}, ${h(regionName(S.region))}, ${countHave()} unlocks, ${Object.keys(S.done).filter(k=>S.done[k]&&!k.startsWith("t:")).length} missions ticked and ${loCount()} of 11 loadout slots set.</p>`;
   if(!C.key)o+=needKey();
   o+=`<div class="orders">${["next","buy","mods","camp"].map(k=>`<button data-order="${k}" ${UI.busy||!C.key?"disabled":""}>${ORDERS[k][0]}</button>`).join("")}
     <button class="wide" data-order="full" ${UI.busy||!C.key?"disabled":""}>Full briefing</button></div>`;
-  if(UI.busy&&UI.busy!=="ask")o+=`<div class="think">Lázaro is checking the logbook<i></i><i></i><i></i></div>`;
+  if(UI.busy&&UI.busy!=="ask")o+=`<div class="think">Working it out<i></i><i></i><i></i></div>`;
   if(UI.err.advisor)o+=`<div class="err">${h(UI.err.advisor)}</div>`;
   o+=S.briefs.map(b=>`<article class="memo"><button class="x" data-delbrief="${b.id}" aria-label="Remove this briefing">×</button><h3>${h(b.title)}</h3><div class="when">${when(b.at)}, at rank ${b.rank}${b.model?", "+h(b.model):""}</div>${md(b.text)}</article>`).join("");
-  if(!S.briefs.length&&C.key&&!UI.busy)o+=`<p class="note" style="margin-top:6px">Tick off what you have in Arsenal, Gear and Missions, then ask for orders. The more you log, the sharper the advice.</p>`;
+  if(!S.briefs.length&&C.key&&!UI.busy)o+=`<p class="note" style="margin-top:6px">Tick off what you have, set your loadout under Arsenal, then tap one of these. The more you log, the better the advice.</p>`;
   return o;
 }
 function viewAsk(){
-  let o=`<p class="lead">Ask anything about the game. Lázaro answers with your logbook in mind.</p>`;
+  let o=`<p class="lead">Ask anything about Far Cry 6. Answers use your logbook and loadout.</p>`;
   if(!C.key)o+=needKey();
   o+=`<div class="chips" style="margin-top:12px">${QUICK.map(q=>`<button class="chip" data-quick="${h(q)}" ${UI.busy||!C.key?"disabled":""}>${h(q)}</button>`).join("")}</div>`;
   o+=`<div class="msgs">${S.chat.map(m=>m.role==="user"?`<div class="msg u"><div>${h(m.text)}</div></div>`:`<div class="msg m"><article class="memo">${md(m.text)}</article></div>`).join("")}</div>`;
-  if(UI.busy==="ask")o+=`<div class="think">Lázaro is thinking<i></i><i></i><i></i></div>`;
+  if(UI.busy==="ask")o+=`<div class="think">Thinking<i></i><i></i><i></i></div>`;
   if(UI.err.ask)o+=`<div class="err">${h(UI.err.ask)}</div>`;
   if(S.chat.length)o+=`<button class="linkbtn" data-act="clearchat">Clear this conversation</button>`;
   o+=`<form class="composer" id="askForm"><textarea id="askIn" placeholder="e.g. How do I get gunpowder?" aria-label="Your question" ${C.key?"":"disabled"}>${h(UI.draft||"")}</textarea><button class="btn" type="submit" ${UI.busy||!C.key?"disabled":""}>Send</button></form>`;
@@ -720,7 +1005,7 @@ function renderList(){
 function render(){
   renderHeader();renderTabs();
   const v=$("#view");
-  if(UI.tab==="arsenal")v.innerHTML=segs("arsenal",[["weapons","Weapons"],["resolver","Resolver"],["supremos","Supremos"]])+tools("Search weapons or places")+`<div id="list"></div>`;
+  if(UI.tab==="arsenal")v.innerHTML=segs("arsenal",[["loadout","Loadout"],["weapons","Weapons"],["resolver","Resolver"],["supremos","Supremos"]])+(UI.seg.arsenal==="loadout"?"":tools("Search weapons or places"))+`<div id="list"></div>`;
   else if(UI.tab==="gear")v.innerHTML=segs("gear",[["sets","Gear"],["amigos","Amigos"],["camp","Camp"]])+(UI.seg.gear==="camp"?"":tools("Search gear"))+`<div id="list"></div>`;
   else if(UI.tab==="missions")v.innerHTML=segs("missions",[["ops","Operations"],["stories","Yaran Stories"],["todo","My list"]])+(UI.seg.missions==="todo"?"":tools("Search missions"))+`<div id="list"></div>`;
   else if(UI.tab==="advisor")v.innerHTML=viewAdvisor();
@@ -729,8 +1014,8 @@ function render(){
 }
 
 /* ===================== SHEETS ===================== */
-function openSheet(html){$("#sheet").innerHTML=html;$("#scrim").classList.add("show");}
-function closeSheet(){$("#scrim").classList.remove("show");S.setup=true;save();render();}
+function openSheet(html){const sh=$("#sheet"),y=sh.scrollTop;sh.innerHTML=html;$("#scrim").classList.add("show");sh.scrollTop=y;}
+function closeSheet(){$("#sheet").scrollTop=0;$("#scrim").classList.remove("show");UI.pick=null;S.setup=true;save();render();}
 function sheetProfile(){
   openSheet(`<div class="sheet-top"><h2>Your guerrilla</h2><button class="iconbtn" data-act="close" aria-label="Close">×</button></div>
   <p>Match these to your game so the Advisor knows what you can reach.</p>
@@ -809,6 +1094,19 @@ document.addEventListener("click",e=>{
   if(d.delcustom){S.custom=S.custom.filter(c=>c.id!==d.delcustom);delete S.have[d.delcustom];save();renderHeader();renderList();return;}
   if(d.deltodo){S.todo=S.todo.filter(x=>String(x.id)!==d.deltodo);save();renderList();return;}
   if(d.delbrief){S.briefs=S.briefs.filter(b=>String(b.id)!==d.delbrief);save();render();return;}
+  if(d.lo){loOpen(d.lo);return;}
+  if(UI.pick){
+    const P=UI.pick;
+    if(d.lopick){loPick(d.lopick);return;}
+    if(d.loview){P.view=d.loview;P.q="";P.all=false;sheetLo(true);return;}
+    if(d.loall){P.all=!P.all;const l=$("#pickList");if(l)l.innerHTML=pickList();return;}
+    if(d.losock){const w=loW(P.slot);if(w){w[d.losock]=w[d.losock]===d.val?"":d.val;save();sheetLo();}return;}
+    if(d.lomod){const w=loW(P.slot);if(w){const m=w.mods||(w.mods=[]),i=m.indexOf(d.lomod);
+      if(i>=0)m.splice(i,1);else if(m.length>=3){toast("3 mod sockets at most. Untick one first.");return;}else m.push(d.lomod);save();sheetLo();}return;}
+    if(d.logad){const s=loSup();if(s){const g=s.gadgets||(s.gadgets=[]),i=g.indexOf(d.logad);
+      if(i>=0)g.splice(i,1);else if(g.length>=4){toast("A Supremo holds 4 gadgets. Untick one first.");return;}else g.push(d.logad);save();sheetLo();}return;}
+    if(d.loclear){const k=P.slot;delete S.loadout[k];save();closeSheet();toast(LO_N[k]+" emptied");return;}
+  }
   if(d.order){runOrder(d.order);return;}
   if(d.quick){sendAsk(d.quick);return;}
   if(d.rank){S.rank=Math.max(1,Math.min(30,S.rank+(+d.rank)));save();sheetProfile();renderHeader();return;}
@@ -832,8 +1130,13 @@ document.addEventListener("click",e=>{
   }
 });
 document.addEventListener("input",e=>{
-  if(e.target.id==="q"){UI.q=e.target.value;renderList();}
-  if(e.target.id==="askIn")UI.draft=e.target.value;
+  const id=e.target.id,v=e.target.value;
+  if(id==="q"){UI.q=v;renderList();}
+  if(id==="askIn")UI.draft=v;
+  if(id==="loJob"){S.loadout.job=v.slice(0,80);save();}
+  if(id==="pickQ"&&UI.pick){UI.pick.q=v;const l=$("#pickList");if(l)l.innerHTML=pickList();}
+  if(id==="loNote"&&UI.pick){const w=loW(UI.pick.slot);if(w){w.note=v.slice(0,80);save();}}
+  if(/^supS[123]$/.test(id)){const s=loSup();if(s){s["s"+id.slice(-1)]=v.slice(0,40);save();}}
 });
 document.addEventListener("change",e=>{if(e.target.id==="model"){C.model=e.target.value;store(CKEY,C);}});
 document.addEventListener("submit",e=>{
