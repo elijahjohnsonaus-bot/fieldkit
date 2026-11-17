@@ -252,7 +252,7 @@ const WEAPONS=[
  {id:"lmgs",n:"Light machine guns",std:[["M60 NV",GG],["MG21",GG],["RPD",GG],["MG42","Treasure hunt: Sweet Fifteen"]],
   uniq:[["Sink or Swim","El Este, Sierra Perdida. Shipwreck off Nueva Vida"],["Impact Driver","Valle de Oro, Barrial. Chancletas Resort courtyard"],["Crackle & Pop","Esperanza. Rooftop of El Rayo Cinema, reached by zipline"],["High-Caliber Beats",UC]]},
  {id:"snipers",n:"Sniper rifles",std:[["Yaran SR-A",GG],[".308 Carbine",GG],["SVD",GG],["MBP .50",GG]],
-  uniq:[["El Depredador","Hunter's Lodge at Perfected tier"],["Sobek Special","Madrugada, Aguas Lindas. Treasure hunt: Cache Money"],["Double Clutch","Finish any Gran Premio race"],["El Tirano","Valle de Oro, Barrial. Lighthouse at Escila Fort"],["The Transubstantiator","Valle de Oro, Noventarmas. Under True Yaran Academy"],["Mixtape",UC],["Kobracon",UC]]},
+  uniq:[["El Depredador","Hunter's Lodge at Perfected tier"],["Sobek Special","Madrugada, Aguas Lindas. Treasure hunt: Cache Money"],["Double Clutch","Finish any Gran Premio race"],["El Tirano","Valle de Oro, Barrial. Lighthouse at Escila Fort"],["The Transubstantiator","Valle de Oro, Noventarmas. Under True Yaran Academy"],["Mixtape",UC],["Kobracon","Blood Dragon pack (Season Pass)"]]},
  {id:"shotguns",n:"Shotguns",std:[["1887 Sawed-Off",GG],["KSG",GG],["M133",GG],["RMS-18",GG],["SBS",GG],["SPAS-12","Treasure hunt: Passing the Torch"]],
   uniq:[["Humidora","Isla Santuario. Top of Punto Este Lighthouse"],["El Rubí","Comes with story progress"],["Ciervo Macho","Hunter's Lodge at Enhanced tier"],["The True Loyalist","Valle de Oro, Noventarmas. Treasure hunt: The Truest Yaran"],["Excavation Execution","El Este, La Joya. Treasure hunt: The Long Drop"],["Supercharger","Madrugada, Aguas Lindas. Top floor of the FND oil platform"],["Com.Pew.Ter","Valle de Oro, Noventarmas. Tower at Taino Peak Relay Station"]]},
  {id:"bows",n:"Bows",std:[["Recurve Bow",GG],["Compound Bow",GG]],
@@ -262,8 +262,20 @@ const WEAPONS=[
  {id:"pistols",n:"Pistols",std:[["PMM","Your starting sidearm"],["M9",GG],["Mark VI",GG],["1911","Treasure hunt: And the Beat Goes On"],["Desert Eagle","Treasure hunt: The Last One to Leave"],["P226","Reward for the operation The Lion's Den"]],
   uniq:[["Blood Drunk","Madrugada, Costa del Mar. Top-floor office of José's Villa"],["The Autocrat","Isla Santuario. Basement of Fort Quito"],["Lethal Dose","Madrugada, Costa del Mar. Treasure hunt: The Mongoose and the Man"],["El Florecer","El Este. Under the stairs at Fontana Fort"],["El Regalo de Clara","Reward for the operation Against the Wall"],["Pistola Sportiva","Esperanza. Commentary box at the baseball field"]]},
  {id:"autopistols",n:"Auto-pistols",std:[["6P13 Auto",GG],["Skorpion",GG],["SMG-11",GG]],
-  uniq:[["Rococo Loco","Reward from a Los Bandidos operation"],["El General","Isla Santuario. Underground armoury at FND Munitions Storage"],["Snapshot","Valle de Oro. Top of Golfo Vasto Lighthouse"],["AJM 9",UC]]}
+  uniq:[["Rococo Loco","Reward from a Los Bandidos operation"],["El General","Isla Santuario. Underground armoury at FND Munitions Storage"],["Snapshot","Valle de Oro. Top of Golfo Vasto Lighthouse"],["AJM 9","Blood Dragon pack (Season Pass)"]]}
 ];
+/* Weapons outside the base game: paid packs, rewards and Lola's Black Market. Not counted in the progress total. */
+const BM="Lola's Black Market", ULT="Ultimate Edition pack", BONUS="Bonus content: store pack or reward";
+const WEAPON_EXTRAS={
+ rifles:[["Croc Hunter Custom",ULT]],
+ smgs:[["MP5",BM],["Eldritch Truth",BM],["Yarapunk Side Piece",BONUS],["Sao Paulo Stinger",BONUS]],
+ lmgs:[['"Libertad Custom" RPD',BM],["Hammer of the Gods",BONUS],["La Americana",BONUS],["Tacticool",BONUS]],
+ snipers:[["Eastern Front",BM+" or Far Cry Credits"],["White Lotus",BONUS],["Digital Love",BONUS]],
+ shotguns:[["Jungle Expedition Special",ULT],['"Libertad Custom" SPAS-12',BM],["1887",BM],["Cartomancer",BONUS],["Big Top",BONUS],["Jade Dragon",BONUS],["Heavy Metal",BONUS]],
+ launchers:[['"Libertad Custom" MGL-6',BM],["La Fiesta",BONUS]],
+ pistols:[["Double-O",BM+" or Far Cry Credits"],["Serenity",BONUS],["Armed Resistance",BONUS],["Siege Sidearm",BONUS],["Derezzer",BONUS],["Heaven & Hell",BONUS]],
+ autopistols:[["Miami Strip Style",ULT],["White Lightning",BONUS]]
+};
 /* name, what it is, rank needed (0 = no rank gate), how */
 const RESOLVER=[
  ["Tostador","Flamethrower",0,"Juan hands it over in the prologue"],
@@ -314,18 +326,36 @@ const SETS=[
  ["Revolutionary","Strong all-rounder: headshot damage, defence and faster healing","Reward for finishing the story",["Beret","Vest","Gloves","Pants","Boots"]]
 ];
 const SLOTS=["Head","Chest","Wrist","Legs","Feet"];
+/* the set name the game shows for each family of pieces */
+const AKA={"Fugitive":"Casual","Munitions":"Ammo","Scrounger":"Scavenger","Rioter":"Armor Piercing","Rioter MK II":"MK II Armor Piercing","Fuego":"Incendiary","Fuego MK II":"MK II Incendiary","Hazmat":"Poison","Hazmat MK II":"MK II Poison","Soft-Target MK II":"MK II Soft-Target","Impact":"Blast","Impact MK II":"MK II Blast","Street Surgeon":"Medic","Parkour":"Traversal","Dark Tech":"Stealth","Techmaster":"Tech","Marksman's":"Sniper","Prisoner's":"Outcast","Trapper":"Hunting","Angler's":"Fishing","Primal":"Animal","Revolutionary":"Leader"};
+/* sets whose pieces have their own names: [set, what it is for, how, [head,chest,wrist,legs,feet], bonus content?] */
+const NAMED_SETS=[
+ ["Triada","Night sight, quieter movement, stronger throwing knives","Triada relic treasure hunts and Oluwa Cave",["Ida's Sigil","Oluwa's Heart","Eternal Dance","Oku's Deliverance","Mimo Abosi's Mirage"],false],
+ ["Special Ops","Gadget and takedown bonuses, quieter at night",BONUS,["Breach and Clear Headset","Breach and Clear Vest","Breach and Clear Gloves","Breach and Clear Pants","Breach and Clear Boots"],true],
+ ["Chromatic","Speed and gadget-kill bonuses",BONUS,["Synthpop Helmet","Synthpop Bomber","Synthpop Gloves","Synthpop Leggings","Synthpop Kicks"],true],
+ ["Covert Strike","",BONUS,["Tactical Headgear","Tactical Vest","Tactical Gloves","Tactical Slacks","Tactical Boots"],true],
+ ["Moto Urbano","",BONUS,["Moto Urbano Headgear","Moto Urbano Jacket","Moto Urbano Gloves","Moto Urbano Bottoms","Moto Urbano Footwear"],true],
+ ["Rule Britannia","",BONUS,["Posh Hat","Posh Jacket","Posh Gloves","Posh Trousers","Posh Shoes"],true],
+ ["Motherland","",BONUS,["Soviet Cap","Soviet Coat","Soviet Watch","Soviet Trousers","Soviet Boots"],true],
+ ["Watch Dogs Legion","Slower camera and turret detection",BONUS,["Tea Time Hat","Tea Time Jacket","Tea Timepiece","Tea Time Hose","Tea Time Doll Shoes"],true],
+ ["Rainbow Six Siege","Tags enemies through walls, bonus damage to blinded enemies",BONUS,["Caveira Beret","Caveira Vest","Caveira Gauntlets","Caveira Fatigues","Caveira Boots"],true],
+ ["Altair's","Stealth: slower detection and much quieter movement",BONUS,["Altair's Hood","Altair's Robes","Altair's Gauntlet","Altair's Trousers","Altair's Boots"],true],
+ ["Dino Park Ranger","",BONUS,["Paddock Cap","Padded Vest","Paddock Bracelet","Paddock Pants","Paddock Boots"],true],
+ ["Blood Dragon","Tags enemies after takedowns, steadier aim","Blood Dragon pack (Season Pass)",["Cyber-Eye","Cyber-Jacket","Cyber-Hands","Cyber-Pants","Cyber-Boots"],true],
+ ["Croc Hunter","",ULT,["Bushwhacker Hat","Bushwhacker Vest","Bushwhacker Band","Bushwhacker Jeans","Bushwhacker Boots"],true],
+ ["Miami Strip","",ULT,["Miami Strip Shades","Miami Strip Coat","Miami Strip Watch","Miami Strip Slacks","Miami Strip Shoes"],true],
+ ["Jungle Expedition","Hunting: tags nearby animals",ULT,["Adventurer's Helmet","Adventurer's Vest","Adventurer's Watch","Adventurer's Slacks","Adventurer's Shoes"],true],
+ ["Panzer","Heavy blast defence",BONUS,["Steel Plate Helmet","Steel Plate Vest","Steel Plate Gloves","Steel Plate Leggings","Steel Plate Boots"],true],
+ ["Circus","",BONUS,["Clown Head","Clown Body","Clown Hands","Clown Limbs","Clown Feet"],true]
+];
 const SINGLES=[
  ["Señor Sonrisa Mask","Head. Reward during the operation Diesel Daisy"],
  ["Hamilton Khaki Field","Wrist. Better defence while sprinting. Comes with story progress"],
- ["Oluwa's Heart","Chest. Quieter movement. Chest in Oluwa Cave, Isla Santuario"],
- ["Eternal Dance","Wrist. Stronger throwing knives. Chest in Oluwa Cave, Isla Santuario"],
- ["Ida's Sigil","Head. Night sight. End of Ida's Triada Relic treasure hunt"],
- ["Oku's Deliverance","Legs. Bonus damage to enemies below you. End of Oku's Triada Relic treasure hunt"],
- ["Mimo Abosi's Mirage","Feet. End of Mimo Abosi's Triada Relic treasure hunt"],
  ["Fifteen Wishes","Wrist. Pesos from takedowns. Treasure hunt: Passing the Torch"],
  ["Love It When You Call Me","Chest. Pesos for freeing civilians. Yaran Story: Big Papi in Little Yara"],
  ["2020 Victoria Fly \"Seeby\"","Feet. Blast defence. Yaran Story: Tanks for the Likes. Missable"],
- ["Canadian, Eh?","Wrist. Pesos for poison kills. Missable, tied to a choice in El Este"]
+ ["Canadian, Eh?","Wrist. Pesos for poison kills. Missable, tied to a choice in El Este"],
+ ["Decontaminant Jacket","Chest. The only piece of the Chem Commander set"]
 ];
 const AMIGOS=[
  ["Guapo","Crocodile. Tanky fighter that revives himself","Operation: Juan of a Kind"],
@@ -377,16 +407,20 @@ let TOTAL=0;
 WEAPONS.forEach(c=>{c.items=[];
   c.std.forEach(([n,note])=>c.items.push({id:"w:"+slug(n),n,note,u:false}));
   c.uniq.forEach(([n,note])=>c.items.push({id:"w:"+slug(n),n,note,u:true}));
-  c.items.forEach(i=>BYNAME[i.n]=[i.id]);TOTAL+=c.items.length;});
+  (WEAPON_EXTRAS[c.id]||[]).forEach(([n,note])=>c.items.push({id:"w:"+slug(n),n,note,u:false,x:true}));
+  c.items.forEach(i=>BYNAME[i.n]=[i.id]);TOTAL+=c.items.filter(i=>!i.x).length;});
 const RES=RESOLVER.map(([n,what,rank,how])=>({id:"r:"+slug(n),n,what,rank,how}));
 const SUP=SUPREMOS.map(([n,what,rank,how])=>({id:"s:"+slug(n),n,what,rank,how}));
 const GSETS=SETS.map(([n,what,how,p])=>({id:slug(n),n,what,how,pieces:p.map((x,i)=>x?{id:"g:"+slug(n)+":"+i,n:n.replace(/ MK II$/,"")+" "+x+(/MK II$/.test(n)?" MK II":""),slot:i}:null).filter(Boolean)}));
+NAMED_SETS.forEach(([n,what,how,p,x])=>GSETS.push({id:slug(n),n,what,how,x:!!x,full:true,pieces:p.map((nm,i)=>({id:"g:"+slug(n)+":"+i,n:nm,slot:i}))}));
 const GSING=SINGLES.map(([n,note])=>({id:"g1:"+slug(n),n,note}));
 const AMI=AMIGOS.map(([n,what,how])=>({id:"a:"+slug(n),n,what,how}));
 const FAC=FACILITIES.map(([n,t])=>({id:slug(n),n,t}));
 [...RES,...SUP,...GSING,...AMI].forEach(i=>BYNAME[i.n]=[i.id]);
 GSETS.forEach(s=>BYNAME[s.n]=s.pieces.map(p=>p.id));
-TOTAL+=RES.length+SUP.length+GSING.length+AMI.length+GSETS.reduce((a,s)=>a+s.pieces.length,0);
+TOTAL+=RES.length+SUP.length+GSING.length+AMI.length+GSETS.filter(s=>!s.x).reduce((a,s)=>a+s.pieces.length,0);
+/* everything that counts towards the progress bar */
+const BASE=new Set([].concat(...WEAPONS.map(c=>c.items.filter(i=>!i.x).map(i=>i.id)),RES.map(x=>x.id),SUP.map(x=>x.id),GSING.map(x=>x.id),AMI.map(x=>x.id),...GSETS.filter(s=>!s.x).map(s=>s.pieces.map(p=>p.id))));
 const opId=n=>"m:"+slug(n), stId=n=>"y:"+slug(n);
 
 /* ===================== STATE ===================== */
@@ -400,6 +434,9 @@ const fresh=()=>({rank:1,region:"isla",style:"",setup:false,have:{"w:pmm":1},fac
 let S=load(SKEY,fresh());
 let C=load(CKEY,{key:"",model:DEFAULT_MODEL,models:[]});
 const save=()=>store(SKEY,S);
+/* the Triada pieces used to be one-off entries; carry any ticks over to the Triada set */
+(function(){const M={"g1:ida-s-sigil":"g:triada:0","g1:oluwa-s-heart":"g:triada:1","g1:eternal-dance":"g:triada:2","g1:oku-s-deliverance":"g:triada:3","g1:mimo-abosi-s-mirage":"g:triada:4"};let ch=false;
+  Object.keys(M).forEach(k=>{if(S.have[k]){S.have[M[k]]=1;delete S.have[k];ch=true;}});if(ch)save();})();
 const UI={tab:"arsenal",seg:{arsenal:"weapons",gear:"sets",missions:"ops"},q:"",filter:"all",open:{},busy:false,err:{advisor:"",ask:""}};
 try{const h=location.hash.slice(1);if(["arsenal","gear","missions","advisor","ask"].includes(h))UI.tab=h;}catch(e){}
 
@@ -425,7 +462,7 @@ function md(src){
 const when=t=>{try{return new Date(t).toLocaleString("en-AU",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"});}catch(e){return "";}};
 
 /* ===================== HEADER ===================== */
-function countHave(){return Object.keys(S.have).filter(k=>S.have[k]&&!k.startsWith("x:")).length;}
+function countHave(){return Object.keys(S.have).filter(k=>S.have[k]&&BASE.has(k)).length;}
 function renderHeader(){
   $("#dani").innerHTML=`<span class="stamp">${S.rank}</span><span><b>${h(rankName(S.rank))}</b><small>${h(regionName(S.region))}${S.style?", "+h(S.style.toLowerCase()):""}</small></span><span class="edit">Update</span>`;
   const n=Math.min(countHave(),TOTAL);
@@ -464,22 +501,26 @@ function customBlock(kind,label){
   return panel("custom-"+kind,"Extras and DLC",all.filter(c=>has(c.id)).length,all.length,body,false);
 }
 
+function rankRow(x){const locked=x.rank>S.rank&&!has(x.id);
+  return row(x.id,x.n,x.what+". "+x.how+(x.rank?`. Needs rank ${x.rank}`:""),has(x.id),locked?`<span class="tag lock">Rank ${x.rank}</span>`:"");}
 function listArsenal(){
   const seg=UI.seg.arsenal;let out="";
   if(seg==="weapons"){
     WEAPONS.forEach((c,i)=>{
       const vis=c.items.filter(it=>match(it.n,it.note,c.n)&&pass(has(it.id)));
-      const std=vis.filter(x=>!x.u),un=vis.filter(x=>x.u);
+      const std=vis.filter(x=>!x.u&&!x.x),un=vis.filter(x=>x.u),ex=vis.filter(x=>x.x),base=c.items.filter(x=>!x.x);
       const body=(std.length?`<div class="subh">Standard</div>`+std.map(x=>row(x.id,x.n,x.note,has(x.id))).join(""):"")
-        +(un.length?`<div class="subh">Unique</div>`+un.map(x=>row(x.id,x.n,x.note,has(x.id),'<span class="tag">Unique</span>')).join(""):"");
-      out+=panel("w-"+c.id,c.n,c.items.filter(x=>has(x.id)).length,c.items.length,body,i===0);
+        +(un.length?`<div class="subh">Unique</div>`+un.map(x=>row(x.id,x.n,x.note,has(x.id),'<span class="tag">Unique</span>')).join(""):"")
+        +(ex.length?`<div class="subh">DLC, store and Black Market (not counted)</div>`+ex.map(x=>row(x.id,x.n,x.note,has(x.id),'<span class="tag lock">Extra</span>')).join(""):"");
+      out+=panel("w-"+c.id,c.n,base.filter(x=>has(x.id)).length,base.length,body,i===0);
     });
+    const rv=RES.filter(x=>match(x.n,x.what,x.how,"resolver weapons")&&pass(has(x.id)));
+    out+=panel("w-resolver","Resolver weapons",RES.filter(x=>has(x.id)).length,RES.length,rv.map(rankRow).join(""),false);
     out+=customBlock("weapon","Add a weapon, e.g. a DLC gun");
   }else{
     const src=seg==="resolver"?RES:SUP;
     const vis=src.filter(x=>match(x.n,x.what,x.how)&&pass(has(x.id)));
-    const body=vis.map(x=>{const locked=x.rank>S.rank&&!has(x.id);
-      return row(x.id,x.n,x.what+". "+x.how+(x.rank?`. Needs rank ${x.rank}`:""),has(x.id),locked?`<span class="tag lock">Rank ${x.rank}</span>`:"");}).join("");
+    const body=vis.map(rankRow).join("");
     out+=panel(seg,seg==="resolver"?"Resolver weapons":"Supremos",src.filter(x=>has(x.id)).length,src.length,body,true);
   }
   return out||none();
@@ -487,16 +528,19 @@ function listArsenal(){
 function listGear(){
   const seg=UI.seg.gear;let out="";
   if(seg==="sets"){
-    const vis=GSETS.filter(s=>{const got=s.pieces.filter(p=>has(p.id)).length;
-      return match(s.n,s.what,s.how)&&(UI.filter==="all"||(UI.filter==="have"?got>0:got<s.pieces.length));});
-    const body=vis.map(s=>{const got=s.pieces.filter(p=>has(p.id)).length,full=got===s.pieces.length;
-      return `<div class="set ${full?"done":""}"><div class="set-h"><b>${h(s.n)}</b><span>${got}/${s.pieces.length}</span></div><p>${h(s.what)}${s.how?". "+h(s.how):""}</p>
-      <div class="slots">${s.pieces.map(p=>`<button data-toggle="${p.id}" aria-pressed="${has(p.id)}" aria-label="${h(p.n)}">${SLOTS[p.slot]}</button>`).join("")}<button class="all" data-setall="${s.id}">${full?"Clear":"All"}</button></div></div>`;}).join("");
-    const tot=GSETS.reduce((a,s)=>a+s.pieces.length,0),got=GSETS.reduce((a,s)=>a+s.pieces.filter(p=>has(p.id)).length,0);
-    out+=panel("sets","Gear sets",got,tot,body,true);
+    const setCard=s=>{const got=s.pieces.filter(p=>has(p.id)).length,full=got===s.pieces.length;
+      const info=[AKA[s.n]?AKA[s.n]+" set":"",s.what,s.how,s.full?"Pieces: "+s.pieces.map(p=>p.n).join(", "):""].filter(Boolean).join(". ");
+      return `<div class="set ${full?"done":""}"><div class="set-h"><b>${h(s.n)}</b><span>${got}/${s.pieces.length}</span></div><p>${h(info)}</p>
+      <div class="slots">${s.pieces.map(p=>`<button data-toggle="${p.id}" aria-pressed="${has(p.id)}" aria-label="${h(p.n)}">${SLOTS[p.slot]}</button>`).join("")}<button class="all" data-setall="${s.id}">${full?"Clear":"All"}</button></div></div>`;};
+    const show=s=>{const got=s.pieces.filter(p=>has(p.id)).length;
+      return match(s.n,AKA[s.n]||"",s.what,s.how,s.pieces.map(p=>p.n).join(" "))&&(UI.filter==="all"||(UI.filter==="have"?got>0:got<s.pieces.length));};
+    const cnt=l=>[l.reduce((a,s)=>a+s.pieces.filter(p=>has(p.id)).length,0),l.reduce((a,s)=>a+s.pieces.length,0)];
+    const baseSets=GSETS.filter(s=>!s.x),xSets=GSETS.filter(s=>s.x),c1=cnt(baseSets),c2=cnt(xSets);
+    out+=panel("sets","Gear sets",c1[0],c1[1],baseSets.filter(show).map(setCard).join(""),true);
     const sv=GSING.filter(x=>match(x.n,x.note)&&pass(has(x.id)));
     out+=panel("singles","One-off pieces",GSING.filter(x=>has(x.id)).length,GSING.length,sv.map(x=>row(x.id,x.n,x.note,has(x.id))).join(""),false);
-    out+=customBlock("gear","Add gear, e.g. a DLC outfit");
+    out+=panel("xsets","Bonus and DLC sets (not counted)",c2[0],c2[1],xSets.filter(show).map(setCard).join(""),false);
+    out+=customBlock("gear","Add gear that is not listed");
   }else if(seg==="amigos"){
     const vis=AMI.filter(x=>match(x.n,x.what,x.how)&&pass(has(x.id)));
     out+=panel("amigos","Amigos",AMI.filter(x=>has(x.id)).length,AMI.length,vis.map(x=>row(x.id,x.n,x.what+". "+x.how,has(x.id))).join(""),true);
@@ -554,10 +598,11 @@ function fieldNotes(){
   N.push("Resolver weapons (rank needed, source): "+RES.map(x=>`${x.n}: ${x.what}, ${x.rank?"rank "+x.rank+", ":""}${x.how}`).join(" | "));
   N.push("Supremos: "+SUP.map(x=>`${x.n}: ${x.what}, ${x.rank?"rank "+x.rank+", ":""}${x.how}`).join(" | "));
   N.push("Unique weapons not yet owned: "+WEAPONS.map(c=>c.items.filter(i=>i.u&&!has(i.id)).map(i=>`${i.n} (${c.n}): ${i.note}`).join(" | ")).filter(Boolean).join(" | "));
-  N.push("Standard weapons not yet owned: "+WEAPONS.map(c=>c.items.filter(i=>!i.u&&!has(i.id)).map(i=>`${i.n}: ${i.note}`).join(" | ")).filter(Boolean).join(" | "));
+  N.push("Standard weapons not yet owned: "+WEAPONS.map(c=>c.items.filter(i=>!i.u&&!i.x&&!has(i.id)).map(i=>`${i.n}: ${i.note}`).join(" | ")).filter(Boolean).join(" | "));
   N.push("Camp facility tiers: "+FAC.map(f=>`${f.n}: Built = ${f.t[0]}; Enhanced = ${f.t[1]}; Perfected = ${f.t[2]}`).join(" | ")+". Each of the three main camps holds two facilities.");
   N.push("Amigo sources: "+AMI.map(a=>`${a.n}: ${a.how}`).join(" | "));
-  N.push("Gear sets: "+GSETS.map(s=>`${s.n}: ${s.what}${s.how?" ("+s.how+")":""}`).join(" | "));
+  N.push("Gear sets (piece family, then the set name the game shows): "+GSETS.filter(s=>!s.x).map(s=>`${s.n}${AKA[s.n]?" / "+AKA[s.n]+" set":""}: ${s.what}${s.how?" ("+s.how+")":""}`).join(" | "));
+  N.push("Bonus weapons and gear from paid packs, rewards and Lola's Black Market also exist. Only bring those up if the logbook shows Dani owns them.");
   return N.join("\n");
 }
 function systemPrompt(){
