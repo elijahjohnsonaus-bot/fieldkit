@@ -618,10 +618,11 @@ async function gemini(turns){
   throw new Error("Gemini could not answer. "+last+". Wait a minute and try again, or pick a different model in Settings.");
 }
 const ORDERS={
- next:["What should I do next?","Based on my logbook, what should I tackle next? Give me the single best next mission or activity and two back-ups, with one line each on why it suits my rank and kit."],
+ next:["What should I do next?","Based on my logbook, what should I tackle next? Give me the single best next mission or activity and two back-ups, with one line each on why it suits my rank and kit. Finish with one line on the best weapon or piece of gear to buy or pick up before I go."],
+ buy:["What should I buy next?","Give me a shopping list from what I do not own yet. Up to three weapons (include any Resolver weapon or Supremo I can buy at my rank) and up to three gear pieces or sets that suit how I play. For each one say where to get it, what it costs if you know (pesos, depleted uranium, or a place to find it), and what it replaces in my current kit. Check my camp facilities first: if the Guerrilla Garrison or Bandidos Barracks is not built, say that comes first. Put them in the order I should get them."],
  mods:["Which mods should I build?","Looking at the weapons I own, which workbench mods and ammo types should I build next? Name the weapon, the mod and what it fixes, and tell me what to save materials for."],
  camp:["Which camp build comes first?","Which camp facility should I build or upgrade next, and why, given what I have built so far? Give me the order for my next three builds."],
- full:["Full briefing","Give me a full briefing in about 300 words with these headings: Next mission, Loadout to run now (weapons, Supremo, Resolver weapon, amigo and gear, only from what I own), Workbench, Camp, Worth grabbing soon."]
+ full:["Full briefing","Give me a full briefing in about 350 words with these headings: Next mission; Loadout to run now (weapons, Supremo, Resolver weapon, amigo and gear, only from what I own); Buy or grab next (two or three weapons, any Resolver weapon or Supremo I can afford at my rank, and two or three gear pieces, each with where to get it and what it replaces); Workbench; Camp."]
 };
 const QUICK=["How do I get gunpowder?","Where do I find depleted uranium?","How do I get Supremo-Bond?","What beats tanks early on?","Best ammo against armoured soldiers?","How do I earn pesos fast?"];
 async function runOrder(k){
@@ -644,8 +645,7 @@ const needKey=()=>`<div class="callout"><b>Tío Lázaro needs a radio.</b><br>Ad
 function viewAdvisor(){
   let o=`<p class="lead">Tío Lázaro reads your logbook first: rank ${S.rank}, ${h(regionName(S.region))}, ${countHave()} unlocks and ${Object.keys(S.done).filter(k=>S.done[k]&&!k.startsWith("t:")).length} missions ticked.</p>`;
   if(!C.key)o+=needKey();
-  o+=`<div class="orders">${["next","mods","camp"].map(k=>`<button data-order="${k}" ${UI.busy||!C.key?"disabled":""}>${ORDERS[k][0]}</button>`).join("")}
-    <button data-seg-go="ask" ${UI.busy?"disabled":""}>Ask your own question</button>
+  o+=`<div class="orders">${["next","buy","mods","camp"].map(k=>`<button data-order="${k}" ${UI.busy||!C.key?"disabled":""}>${ORDERS[k][0]}</button>`).join("")}
     <button class="wide" data-order="full" ${UI.busy||!C.key?"disabled":""}>Full briefing</button></div>`;
   if(UI.busy&&UI.busy!=="ask")o+=`<div class="think">Lázaro is checking the logbook<i></i><i></i><i></i></div>`;
   if(UI.err.advisor)o+=`<div class="err">${h(UI.err.advisor)}</div>`;
