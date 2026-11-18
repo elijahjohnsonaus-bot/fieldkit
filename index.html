@@ -251,6 +251,15 @@ nav button[aria-current=page]{color:var(--yellow)}
 .sheet .sock .chip{font-size:14.5px;padding:6px 10px}
 .sheet h3 small{font-family:var(--cond);font-weight:600;font-size:14px;color:#6b5a48;margin-left:8px}
 .sheet .lo-note{margin:12px 0 4px}
+.lo-tier{display:flex;gap:3px;margin-top:8px}
+.lo-tier i{flex:1;height:5px;border-radius:1px;background:rgba(244,236,216,.18)}
+.lo-tier i.on{background:var(--yellow)}
+.sheet .tiers{margin:4px 0 6px}
+.sheet .tiers button{padding:10px 2px;font-size:15px;border-color:#8c7a63;color:var(--ink)}
+.sheet .tiers button[aria-pressed=true]{background:var(--red);border-color:var(--red);color:var(--bone)}
+.lo-tierrow{padding:10px 2px;border-bottom:1px dashed #c3b296;font-size:14.5px;line-height:1.35;color:#4a3a2f}
+.lo-tierrow b{display:block;font-family:var(--cond);font-weight:700;font-size:15.5px;color:var(--ink)}
+.lo-tierrow.got b{color:var(--red)}
 @media (min-width:700px){h1{font-size:42px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -678,7 +687,15 @@ function kindOf(it){
 const sockFor=it=>it&&it.t==="w"&&!it.u?SOCK[it.cat]||null:null;
 const canSide=it=>!!it&&((it.t==="w"&&(it.cat==="pistols"||it.cat==="autopistols"))||it.t==="xw");
 const ammoCls=a=>/Armor Piercing/.test(a)?"ap":/Soft-Target|Buckshot/.test(a)?"st":/Blast/.test(a)?"bl":/Poison/.test(a)?"po":/Incendiary/.test(a)?"in":"";
-const loSig=()=>JSON.stringify(S.loadout||{});
+const loSig=()=>JSON.stringify(S.loadout||{})+"|"+JSON.stringify(S.fac||{});
+/* checks saved before camp was part of the check only recorded the loadout */
+const loFresh=sig=>!sig||sig===loSig()||sig===JSON.stringify(S.loadout||{});
+/* set a camp facility tier. The Hunter's Lodge tiers hand over weapons, so tick those too */
+function setFac(id,lv){
+  S.fac[id]=lv;const added=[];
+  if(id==="hunter-s-lodge")[["El Capirote",1],["Ciervo Macho",2],["El Depredador",3]].forEach(([n,l])=>{const w=BYNAME[n][0];if(lv>=l&&!S.have[w]){S.have[w]=1;added.push(n);}});
+  save();if(added.length)toast("Also ticked as unlocked: "+added.join(", "));
+}
 const loW=k=>{const w=S.loadout[k];return w&&itemOf(w.id)?w:null;};
 const loSup=()=>{const s=S.loadout.sup;return s&&itemOf(s.id)?s:null;};
 function loCount(){const L=S.loadout;return LO_W.filter(([k])=>loW(k)).length+(loSup()?1:0)+LO_G.filter(([k])=>itemOf(L[k])).length+(itemOf(L.amigo)?1:0);}
@@ -704,12 +721,15 @@ function loBoard(){
   o+=`<div class="lo-h">Weapons<span>${nW}/4</span></div>`+LO_W.map(wCard).join("");
   o+=`<div class="lo-h">Supremo</div><button class="lo-slot ${si?"":"empty"}" data-lo="sup"><span class="lo-sl">Backpack</span><span class="lo-sn">${si?h(si.n):"Empty"}</span>${si?"":`<span class="lo-ss">Tap to equip a Supremo and its gadgets</span>`}<span class="lo-gad">${gad}</span>${sockT?`<span class="lo-tags">${sockT}</span>`:""}</button>`;
   o+=`<div class="lo-h">Gear<span>${nG}/5</span></div><div class="lo-grid">${LO_G.map(([k,lab])=>gCard(k,lab)).join("")}${gCard("amigo","Amigo")}</div>`;
+  const fCard=f=>{const lv=S.fac[f.id]||0;
+    return `<button class="lo-slot ${lv?"":"empty"}" data-lofac="${f.id}"><span class="lo-sn">${h(f.n)}</span><span class="lo-ss">${lv?TIERS[lv]:"Not built"}</span><span class="lo-tier">${[1,2,3].map(i=>`<i class="${lv>=i?"on":""}"></i>`).join("")}</span></button>`;};
+  o+=`<div class="lo-h">Camp<span>${FAC.filter(f=>(S.fac[f.id]||0)>0).length}/6 built</span></div><div class="lo-grid">${FAC.map(fCard).join("")}</div>`;
   const busy=UI.busy,last=S.briefs.find(b=>b.kind==="loadout");
   o+=`<div class="lo-ask"><input class="search" type="text" id="loJob" maxlength="80" autocomplete="off" placeholder="Next job (optional), e.g. FND base, tank convoy" aria-label="Next job" value="${h(L.job||"")}"><button class="btn block" data-order="loadout" ${busy||!C.key?"disabled":""}>What should I change?</button></div>`;
   if(!C.key)o+=needKey();
   if(busy==="loadout")o+=`<div class="think">Checking your loadout<i></i><i></i><i></i></div>`;
   if(UI.err.loadout)o+=`<div class="err">${h(UI.err.loadout)}</div>`;
-  if(last&&busy!=="loadout")o+=`<article class="memo"><button class="x" data-delbrief="${last.id}" aria-label="Remove this check">×</button><h3>${h(last.title)}</h3><div class="when">${when(last.at)}${last.model?", "+h(last.model):""}</div>${last.sig&&last.sig!==loSig()?`<p class="lo-stale">Loadout changed since this check. Tap the button again for a fresh one.</p>`:""}${md(last.text)}</article>`;
+  if(last&&busy!=="loadout")o+=`<article class="memo"><button class="x" data-delbrief="${last.id}" aria-label="Remove this check">×</button><h3>${h(last.title)}</h3><div class="when">${when(last.at)}${last.model?", "+h(last.model):""}</div>${loFresh(last.sig)?"":`<p class="lo-stale">Loadout or camp changed since this check. Tap the button again for a fresh one.</p>`}${md(last.text)}</article>`;
   return o;
 }
 
@@ -789,9 +809,17 @@ function sheetSupBench(){
   <label for="supS3">Special upgrade socket</label><input type="text" id="supS3" maxlength="40" autocomplete="off" value="${h(sp.s3||"")}" placeholder="${h(SUP_SPECIAL[it.n]?"e.g. "+SUP_SPECIAL[it.n]:"The upgrade only this Supremo has")}">
   <div class="rowbtns" style="margin-top:18px"><button class="btn dark" data-act="close">Done</button><button class="btn ghost" data-loclear="1">Empty this slot</button></div>`;
 }
+function sheetFac(){
+  const f=FAC.find(x=>x.id===UI.pick.fac),lv=S.fac[f.id]||0;
+  return `<div class="sheet-top"><h2>${h(f.n)}</h2><button class="iconbtn" data-act="close" aria-label="Close">×</button></div>
+  <p>Tap the tier you've built. Each main camp holds two facilities.</p>
+  <div class="tiers">${TIERS.map((t,i)=>`<button data-lotier="${i}" aria-pressed="${lv===i}">${t}</button>`).join("")}</div>
+  ${f.t.map((d,i)=>`<div class="lo-tierrow ${lv>i?"got":""}"><b>${TIERS[i+1]}${lv>i?" ✓":""}</b>${h(d)}</div>`).join("")}
+  <div class="rowbtns" style="margin-top:18px"><button class="btn dark" data-act="close">Done</button></div>`;
+}
 function sheetLo(top){
   const P=UI.pick,k=P.slot;
-  openSheet(P.view==="bench"&&isW(k)&&loW(k)?sheetBench():P.view==="bench"&&k==="sup"&&loSup()?sheetSupBench():sheetChoose());
+  openSheet(k==="fac"?sheetFac():P.view==="bench"&&isW(k)&&loW(k)?sheetBench():P.view==="bench"&&k==="sup"&&loSup()?sheetSupBench():sheetChoose());
   if(top)$("#sheet").scrollTop=0;
 }
 function loOpen(k){
@@ -954,7 +982,7 @@ const ORDERS={
  mods:["Which mods should I build?","Which workbench mods and ammo should I build next for the weapons in my current loadout (or my owned weapons if no loadout is entered)? One point each: weapon, mod or ammo, what it fixes. Last point: which materials to save."],
  camp:["Which camp build comes first?","Which camp facilities should I build or upgrade next? My next three builds in order, one point each with the reason in a few words."],
  full:["Full briefing","Full briefing. Short headings with dot points under each: Next mission; Loadout changes; Buy or grab next; Workbench; Camp. About 200 words, actions only."],
- loadout:["Loadout check","Check my CURRENT LOADOUT and tell me exactly what to change. One point per change, written as 'Slot: what to do', e.g. 'Primary 2: switch the ammo to **Armor Piercing Rounds**'. Use things I own. Only name something I don't own if nothing I own fits, and say where to get it. Fill any empty slot. Make sure my three primaries cover unarmoured soldiers, armoured soldiers and vehicles between them, that my muzzles and gear suit how I play, and that my Supremo gadgets back up my weapons. If a next job is given, set me up for that. Leave out slots that are already right, then finish with one point starting 'Keep:' that lists them. If nothing needs changing, say that in one point."]
+ loadout:["Loadout check","Check my CURRENT LOADOUT and my camp facilities (in the LOGBOOK) and tell me exactly what to change. One point per change, written as 'Slot: what to do', e.g. 'Primary 2: switch the ammo to **Armor Piercing Rounds**'. Use things I own. Only name something I don't own if nothing I own fits, and say where to get it. Fill any empty slot. Make sure my three primaries cover unarmoured soldiers, armoured soldiers and vehicles between them, that my muzzles and gear suit how I play, and that my Supremo gadgets back up my weapons. If a next job is given, set me up for that. Leave out slots that are already right, then one point starting 'Keep:' that lists them. Last, one point starting 'Camp:' with the single next facility to build or upgrade and what it gets me, unless all six are Perfected. If nothing needs changing, say that in one point."]
 };
 const QUICK=["How do I get gunpowder?","Where do I find depleted uranium?","How do I get Supremo-Bond?","What beats tanks early on?","Best ammo against armoured soldiers?","How do I earn pesos fast?"];
 async function runOrder(k){
@@ -1088,15 +1116,15 @@ document.addEventListener("click",e=>{
   if(d.panel){const p=t.parentElement,o=!p.classList.contains("open");UI.open[d.panel]=o;p.classList.toggle("open",o);t.setAttribute("aria-expanded",o);return;}
   if(d.toggle){toggle(d.toggle);return;}
   if(d.setall){const s=GSETS.find(x=>x.id===d.setall),full=s.pieces.every(p=>has(p.id));s.pieces.forEach(p=>{if(full)delete S.have[p.id];else S.have[p.id]=1;});save();renderHeader();renderList();return;}
-  if(d.fac){S.fac[d.fac]=+d.lv;
-    if(d.fac==="hunter-s-lodge"){[["El Capirote",1],["Ciervo Macho",2],["El Depredador",3]].forEach(([n,l])=>{if(+d.lv>=l)S.have[BYNAME[n][0]]=1;});}
-    save();renderHeader();renderList();return;}
+  if(d.fac){setFac(d.fac,+d.lv);renderHeader();renderList();return;}
   if(d.delcustom){S.custom=S.custom.filter(c=>c.id!==d.delcustom);delete S.have[d.delcustom];save();renderHeader();renderList();return;}
   if(d.deltodo){S.todo=S.todo.filter(x=>String(x.id)!==d.deltodo);save();renderList();return;}
   if(d.delbrief){S.briefs=S.briefs.filter(b=>String(b.id)!==d.delbrief);save();render();return;}
   if(d.lo){loOpen(d.lo);return;}
+  if(d.lofac){UI.pick={slot:"fac",fac:d.lofac};sheetLo(true);return;}
   if(UI.pick){
     const P=UI.pick;
+    if(d.lotier&&P.slot==="fac"){setFac(P.fac,+d.lotier);sheetLo();return;}
     if(d.lopick){loPick(d.lopick);return;}
     if(d.loview){P.view=d.loview;P.q="";P.all=false;sheetLo(true);return;}
     if(d.loall){P.all=!P.all;const l=$("#pickList");if(l)l.innerHTML=pickList();return;}
