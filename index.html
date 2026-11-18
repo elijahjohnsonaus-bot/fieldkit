@@ -138,6 +138,11 @@ h1{font-family:var(--stencil);font-weight:400;font-size:34px;line-height:.92;mar
 .memo p{margin:0 0 9px}
 .memo ul,.memo ol{margin:0 0 9px;padding-left:28px}
 .memo li{margin-bottom:5px}
+.memo>ul>li,.memo>ol>li{margin-bottom:11px}
+.memo li>ul,.memo li>ol{margin:5px 0 2px;padding-left:16px}
+.memo li li{margin-bottom:4px;font-size:14.5px;line-height:1.4;color:#3a2c23}
+.memo ul ul{list-style:circle}
+.memo .lbl{font-family:var(--cond);font-weight:700;font-size:13.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--red)}
 .memo h4{font-family:var(--cond);font-weight:700;font-size:17px;margin:10px 0 4px;color:var(--red)}
 .memo strong{font-family:var(--body);font-weight:600;background:linear-gradient(transparent 60%,rgba(247,201,15,.55) 60%)}
 .memo code{font-family:inherit;background:rgba(0,0,0,.08);padding:0 3px}
@@ -544,16 +549,32 @@ const rankName=r=>r<=14?RANKS[r-1]:"Comandante";
 const regionName=id=>(REGIONS.find(r=>r.id===id)||REGIONS[0]).n;
 let toastT;
 function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2600);}
+/* small markdown: bold, italics, code, headings and lists, including indented sub-points */
+const MD_L="Where|How|Cost|Needs|Replaces|Why|Gets you|Bring|Keep|Camp";
+const MD_LBL=new RegExp("^(?:<strong>("+MD_L+")(?::\\s*</strong>|</strong>\\s*:)|("+MD_L+"):)\\s*");
 function md(src){
   const inline=t=>t.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/(^|[^*])\*(?!\s)([^*]+?)\*(?!\*)/g,"$1<em>$2</em>").replace(/`([^`]+)`/g,"<code>$1</code>");
-  let out="",list=null;const close=()=>{if(list){out+="</"+list+">";list=null;}};
-  h(src).split(/\r?\n/).forEach(raw=>{const l=raw.trim();let m;
-    if((m=l.match(/^[-*•]\s+(.*)/))){if(list!=="ul"){close();out+="<ul>";list="ul";}out+="<li>"+inline(m[1])+"</li>";return;}
-    if((m=l.match(/^\d+[.)]\s+(.*)/))){if(list!=="ol"){close();out+="<ol>";list="ol";}out+="<li>"+inline(m[1])+"</li>";return;}
-    close();if(!l)return;
+  /* "Where:", "How:" and friends at the start of a point get a label style */
+  const lbl=t=>t.replace(MD_LBL,(m,a,b)=>'<span class="lbl">'+(a||b)+':</span> ');
+  let out="";const st=[];   // open lists, innermost last: {t:"ul"|"ol",ind}
+  const closeTo=ind=>{while(st.length&&st[st.length-1].ind>ind)out+="</li></"+st.pop().t+">";};
+  h(src).replace(/\t/g,"    ").split(/\r?\n/).forEach(raw=>{
+    const ind=raw.match(/^ */)[0].length,l=raw.trim();let m,t="",body="";
+    if((m=l.match(/^[-*•+]\s+(.*)/))){t="ul";body=m[1];}
+    else if((m=l.match(/^\d+[.)]\s+(.*)/))){t="ol";body=m[1];}
+    if(t){
+      closeTo(ind);const top=st[st.length-1];
+      if(top&&top.ind===ind){if(top.t===t)out+="</li>";else{out+="</li></"+st.pop().t+"><"+t+">";st.push({t,ind});}}
+      else{out+="<"+t+">";st.push({t,ind});}
+      out+="<li>"+lbl(inline(body));return;
+    }
+    if(!l)return;
+    if(st.length&&ind>0){out+="<br>"+lbl(inline(l));return;}   // a wrapped line that belongs to the point above
+    closeTo(-1);
     if((m=l.match(/^#{1,4}\s+(.*)/))){out+="<h4>"+inline(m[1])+"</h4>";return;}
-    out+="<p>"+inline(l)+"</p>";});
-  close();return out;
+    out+="<p>"+inline(l)+"</p>";
+  });
+  closeTo(-1);return out;
 }
 const when=t=>{try{return new Date(t).toLocaleString("en-AU",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"});}catch(e){return "";}};
 
@@ -904,6 +925,16 @@ function fieldNotes(){
   N.push("Gear sets (piece family, then the set name the game shows): "+GSETS.filter(s=>!s.x).map(s=>`${s.n}${AKA[s.n]?" / "+AKA[s.n]+" set":""}: ${s.what}${s.how?" ("+s.how+")":""}`).join(" | "));
   N.push("Bonus weapons and gear from paid packs, rewards and Lola's Black Market also exist. Only bring those up if the logbook shows the player owns them.");
   N.push("Loadout rules: three primary weapon slots take any weapon, and a Resolver weapon has to use one of them. The sidearm slot takes pistols and auto-pistols. One Supremo with up to four gadgets plus a Supremo socket, a charger socket and a special upgrade socket. Five gear slots: head, chest, wrist, legs, feet. One amigo out at a time. Unique weapons have fixed mods that cannot be changed.");
+  N.push("How things work: "+[
+    "Swap weapons, Supremo and gear in the pause menu's Arsenal tab. A gear piece's look can be changed to another unlocked piece of the same type without losing its bonus",
+    "Change amigo in the pause menu's Amigos tab, then hold the button on the one you want to summon it",
+    "Workbenches are at Libertad camps and hideouts. Pick the weapon, then set its ammo, muzzle, optical, pointer and mod sockets. Mods cost crafting materials. The workbench's Supremo section crafts gadgets (healing syringes included) and Supremo mods with Supremo-Bond and materials",
+    "Juan's arms dealers show as a green shopping-cart icon on the map. They sell Resolver weapons and Supremos for depleted uranium, plus standard weapons and gear as your rank goes up",
+    "Depleted uranium comes from destroying anti-aircraft cannons",
+    "Supremo-Bond: every ambush and supply drop gives one, and some Libertad crates and Bandidos operations give more",
+    "Camp facilities are built and upgraded at the Construction Desk in a Libertad camp, paid mainly in Yaran pesos. Each of the three main camps has two plots",
+    "Standard weapons come from Juan's arms dealers by rank, the Guerrilla Garrison by tier, and FND crates. The Bandidos Barracks sells gear"
+  ].join(". ")+".");
   return N.join("\n");
 }
 function systemPrompt(){
@@ -911,17 +942,21 @@ function systemPrompt(){
 
 HOW TO ANSWER
 - Dot points only. No intro, greeting, sign-off or wrap-up.
-- Each point is one concrete thing to do, equip, buy or build, or a fact they asked for. Start with the action.
-- Bold item, mission and place names.
-- Keep it tight: 8 points or fewer unless the request asks for more.
-- Plain, direct English with Australian spelling. No character, roleplay, slang, Spanish or jokes. No em dashes. Use the game's own item names.
+- One main point per action, starting with the action. Bold item, mission and place names.
+- The player needs to be able to do every action without looking anything up. So under every action, add indented sub-points (two spaces, then "- ") that start with these labels, as they apply:
+  - Where: the region, the area and the nearest landmark, camp or hideout to fast travel to, or which vendor or map icon to go to.
+  - How: the steps in order, including the in-game menus (pause menu Arsenal tab, workbench sockets, the Construction Desk) and anything needed first (a rank, a facility tier, a key, a treasure hunt, an earlier mission).
+  - Cost: pesos, depleted uranium, Supremo-Bond or materials.
+- Write labels as plain text, not bold. Detail beats brevity, but don't pad: no general tips the request didn't ask for.
+- Plain, direct English with Australian spelling. No character, roleplay, slang, Spanish or jokes. No em dashes. Use the game's own names.
 - Only use short headings when the request asks for them. No tables.
 
 WHAT YOU KNOW
 - LOGBOOK is what the player has unlocked and done. Trust it.
 - CURRENT LOADOUT is exactly what they have equipped right now. Anything equipped counts as owned.
 - Recommend things they own. If something they don't own is clearly better, say exactly where to get it and check its rank against theirs.
-- Use FIELD NOTES for how-to-get facts, otherwise your own knowledge of Far Cry 6. If you're not sure of an exact location, cost or number, say "not sure" instead of guessing.
+- Use FIELD NOTES first for locations and how things work, then your own knowledge of Far Cry 6.
+- Never make up a location, cost or number. If you're not sure of the exact spot, say "not sure of the exact spot" and give the best way to find it in game, such as the map icon to look for or the area to search.
 
 SPOILERS: weapon, gear and location spoilers are fine. Never reveal story events, twists, character fates or endings, and don't describe what happens in missions they haven't done. Refer to missions by name only.
 
@@ -977,12 +1012,12 @@ async function gemini(turns){
   throw new Error("Gemini could not answer. "+last+". Wait a minute and try again, or pick a different model in Settings.");
 }
 const ORDERS={
- next:["What should I do next?","What should I do next? First point: the single best mission or activity and where it is. Then two back-ups. Last point: one thing to grab or equip before I go. One line each."],
- buy:["What should I buy next?","What should I buy or pick up next? Up to three weapons (including any Resolver weapon or Supremo I can get at my rank) and up to three gear pieces that suit how I play, in the order to get them. One point each: the item, where to get it, the cost if you know it, and which loadout slot it goes in or replaces. If my Guerrilla Garrison or Bandidos Barracks isn't built, make building it the first point."],
- mods:["Which mods should I build?","Which workbench mods and ammo should I build next for the weapons in my current loadout (or my owned weapons if no loadout is entered)? One point each: weapon, mod or ammo, what it fixes. Last point: which materials to save."],
- camp:["Which camp build comes first?","Which camp facilities should I build or upgrade next? My next three builds in order, one point each with the reason in a few words."],
- full:["Full briefing","Full briefing. Short headings with dot points under each: Next mission; Loadout changes; Buy or grab next; Workbench; Camp. About 200 words, actions only."],
- loadout:["Loadout check","Check my CURRENT LOADOUT and my camp facilities (in the LOGBOOK) and tell me exactly what to change. One point per change, written as 'Slot: what to do', e.g. 'Primary 2: switch the ammo to **Armor Piercing Rounds**'. Use things I own. Only name something I don't own if nothing I own fits, and say where to get it. Fill any empty slot. Make sure my three primaries cover unarmoured soldiers, armoured soldiers and vehicles between them, that my muzzles and gear suit how I play, and that my Supremo gadgets back up my weapons. If a next job is given, set me up for that. Leave out slots that are already right, then one point starting 'Keep:' that lists them. Last, one point starting 'Camp:' with the single next facility to build or upgrade and what it gets me, unless all six are Perfected. If nothing needs changing, say that in one point."]
+ next:["What should I do next?","What should I do next? Main point 1: the single best mission or activity for me right now, with sub-points Where: (region, area and the nearest camp or hideout to fast travel to), How: (how to start it, such as who gives it or which map marker, then the main steps with no story spoilers) and Bring: (what from my loadout to use or swap first). Then two back-ups as main points, each with Where: and How:. Last main point: one thing to grab or equip before I go, with Where: and How:."],
+ buy:["What should I buy next?","What should I buy or pick up next? Up to three weapons (including any Resolver weapon or Supremo I can get at my rank) and up to three gear pieces that suit how I play, in the order to get them. Each one is a main point with sub-points: Where: (the vendor or exact spot, with region and area), How: (the steps to get there and get it, including anything needed first such as a rank, a facility tier, a key or a treasure hunt), Cost: (if known) and Replaces: (which loadout slot it goes in). If my Guerrilla Garrison or Bandidos Barracks isn't built, make building it the first main point, with Where:, How: and Cost:."],
+ mods:["Which mods should I build?","Which workbench mods and ammo should I build next for the weapons in my current loadout (or my owned weapons if no loadout is entered)? Each one is a main point ('weapon: mod or ammo') with sub-points: Why: (what it fixes), How: (the workbench steps, and the nearest place with a workbench) and Cost: (materials). Last main point: the materials to farm, each with Where: and How:."],
+ camp:["Which camp build comes first?","Which camp facilities should I build or upgrade next? My next three builds in order. Each one is a main point with sub-points: Gets you: (what it unlocks), Where: (which camp's Construction Desk), How: (the steps) and Cost: (if known)."],
+ full:["Full briefing","Full briefing with these short headings: Next mission; Loadout changes; Buy or grab next; Workbench; Camp. Under each heading, give main points for the actions, each with Where: and How: sub-points, plus Cost: when something costs. Up to about 450 words."],
+ loadout:["Loadout check","Check my CURRENT LOADOUT and my camp facilities (in the LOGBOOK) and tell me exactly what to change. One main point per change, written as 'Slot: what to do', e.g. 'Primary 2: switch the ammo to **Armor Piercing Rounds**'. Under each, add sub-points: How: (the exact steps, such as the pause menu Arsenal tab for a swap or a workbench for ammo and mods, and the nearest place to do it), Where: (where to get anything I don't own yet, with region and area) and Cost: (if it costs anything). Use things I own. Only name something I don't own if nothing I own fits. Fill any empty slot. Make sure my three primaries cover unarmoured soldiers, armoured soldiers and vehicles between them, that my muzzles and gear suit how I play, and that my Supremo gadgets back up my weapons. If a next job is given, set me up for that. Leave out slots that are already right, then one main point starting 'Keep:' that lists them. Last, one main point starting 'Camp:' with the single next facility to build or upgrade and what it gets me, with Where:, How: and Cost: sub-points, unless all six are Perfected. If nothing needs changing, say that in one point."]
 };
 const QUICK=["How do I get gunpowder?","Where do I find depleted uranium?","How do I get Supremo-Bond?","What beats tanks early on?","Best ammo against armoured soldiers?","How do I earn pesos fast?"];
 async function runOrder(k){
