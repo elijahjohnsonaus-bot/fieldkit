@@ -256,6 +256,10 @@ nav button[aria-current=page]{color:var(--yellow)}
 .sheet .sock .chip{font-size:14.5px;padding:6px 10px}
 .sheet h3 small{font-family:var(--cond);font-weight:600;font-size:14px;color:#6b5a48;margin-left:8px}
 .sheet .lo-note{margin:12px 0 4px}
+.lo-camps{margin:0 0 10px}
+.lo-cl{font-family:var(--cond);font-weight:700;font-size:12.5px;letter-spacing:1px;text-transform:uppercase;color:rgba(244,236,216,.6);margin:0 2px 6px}
+.lo-plots{font-size:14px;line-height:1.35;color:rgba(244,236,216,.82);margin:8px 2px 0}
+.lo-plots.full{color:var(--yellow);font-weight:600}
 .lo-tier{display:flex;gap:3px;margin-top:8px}
 .lo-tier i{flex:1;height:5px;border-radius:1px;background:rgba(244,236,216,.18)}
 .lo-tier i.on{background:var(--yellow)}
@@ -438,6 +442,8 @@ const FACILITIES=[
  ["Hunter's Lodge",["Prey hunting spots, Primal gear to trade for, and the El Capirote bow","Predator hunting spots, the Ciervo Macho shotgun, more meat per kill","Mythical animal spots, the El Depredador rifle, hunt with any weapon without ruining meat"]],
  ["Fishing Hut",["Easy fishing spots and the first fishing gear","Hard fishing spots, more gear, throwable bait","Extreme fishing spots, last gear piece, fish with any weapon"]]
 ];
+/* the three guerrilla camps: id (region), name, region, the operation that unlocks it. Each camp has two build plots */
+const CAMPS=[["mad","Montero Farm","Madrugada","Meet the Monteros"],["valle","Camp Máximas","Valle de Oro","Meet Máximas Matanzas"],["este","Patriotas Peak","El Este","Meet the Legends"]];
 const OPS={
  isla:["La Noche de la Muerte","The Lucky One","Juan of a Kind","Du or Die","Fire and Fury","Fuel the Revolution","Libertad Rises","The Guerrilla"],
  mad:["Meet the Monteros","Clear the Air","Napoleon El Pequeño","Blood Ties","Second Son","Packing Heat","Sundown","Bury the Hatchet","Death Warrant","Open Skies","Diesel Daisy","Fly Ball","Justicia Montero"],
@@ -530,7 +536,7 @@ const API="https://generativelanguage.googleapis.com/v1beta/models";
 let storageOK=true;
 function load(k,def){try{const v=localStorage.getItem(k);return v?Object.assign(def,JSON.parse(v)):def;}catch(e){storageOK=false;return def;}}
 function store(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){storageOK=false;}}
-const fresh=()=>({rank:1,region:"isla",style:"",setup:false,have:{"w:pmm":1},fac:{},done:{},custom:[],todo:[],briefs:[],chat:[],loadout:{}});
+const fresh=()=>({rank:1,region:"isla",style:"",setup:false,have:{"w:pmm":1},fac:{},done:{},custom:[],todo:[],briefs:[],chat:[],loadout:{},camps:{}});
 let S=load(SKEY,fresh());
 let C=load(CKEY,{key:"",model:DEFAULT_MODEL,models:[]});
 const save=()=>store(SKEY,S);
@@ -538,6 +544,9 @@ const save=()=>store(SKEY,S);
 (function(){const M={"g1:ida-s-sigil":"g:triada:0","g1:oluwa-s-heart":"g:triada:1","g1:eternal-dance":"g:triada:2","g1:oku-s-deliverance":"g:triada:3","g1:mimo-abosi-s-mirage":"g:triada:4"};let ch=false;
   Object.keys(M).forEach(k=>{if(S.have[k]){S.have[M[k]]=1;delete S.have[k];ch=true;}});if(ch)save();})();
 if(!S.loadout||typeof S.loadout!=="object")S.loadout={};
+if(!S.camps||typeof S.camps!=="object")S.camps={};
+/* a ticked "Meet the ..." operation means that region's camp is open */
+{let ch=false;CAMPS.forEach(([id,,,m])=>{if(S.done[opId(m)]&&!S.camps[id]){S.camps[id]=true;ch=true;}});if(ch)save();}
 const UI={tab:"arsenal",seg:{arsenal:"loadout",gear:"sets",missions:"ops"},q:"",filter:"all",open:{},busy:false,err:{advisor:"",ask:"",loadout:""},pick:null};
 try{const h=location.hash.slice(1);if(["arsenal","gear","missions","advisor","ask"].includes(h))UI.tab=h;}catch(e){}
 
@@ -663,7 +672,7 @@ function listGear(){
     const vis=AMI.filter(x=>match(x.n,x.what,x.how)&&pass(has(x.id)));
     out+=panel("amigos","Amigos",AMI.filter(x=>has(x.id)).length,AMI.length,vis.map(x=>row(x.id,x.n,x.what+". "+x.how,has(x.id))).join(""),true);
   }else{
-    out+=`<p class="note">Each main camp holds two facilities, so pick your first two carefully. Tap the tier you have reached.</p>`;
+    out+=campBar()+`<p class="note">Each camp has two build plots, and each facility can only be built once. Tap the tier you have reached.</p>`;
     const body=FAC.map(f=>{const lv=S.fac[f.id]||0;
       const next=lv<3?`<em>Next, ${TIERS[lv+1]}:</em> ${h(f.t[lv])}`:"Fully upgraded";
       return `<div class="fac"><b>${h(f.n)}</b><p>${next}</p><div class="tiers">${TIERS.map((t,i)=>`<button data-fac="${f.id}" data-lv="${i}" aria-pressed="${lv===i}">${t}</button>`).join("")}</div></div>`;}).join("");
@@ -708,9 +717,31 @@ function kindOf(it){
 const sockFor=it=>it&&it.t==="w"&&!it.u?SOCK[it.cat]||null:null;
 const canSide=it=>!!it&&((it.t==="w"&&(it.cat==="pistols"||it.cat==="autopistols"))||it.t==="xw");
 const ammoCls=a=>/Armor Piercing/.test(a)?"ap":/Soft-Target|Buckshot/.test(a)?"st":/Blast/.test(a)?"bl":/Poison/.test(a)?"po":/Incendiary/.test(a)?"in":"";
-const loSig=()=>JSON.stringify(S.loadout||{})+"|"+JSON.stringify(S.fac||{});
-/* checks saved before camp was part of the check only recorded the loadout */
-const loFresh=sig=>!sig||sig===loSig()||sig===JSON.stringify(S.loadout||{});
+const loSig=()=>JSON.stringify(S.loadout||{})+"|"+JSON.stringify(S.fac||{})+"|"+JSON.stringify(S.camps||{});
+/* checks saved by earlier versions recorded less, so compare them the way they were saved */
+const loFresh=sig=>{if(!sig)return true;const L=JSON.stringify(S.loadout||{}),F=JSON.stringify(S.fac||{});return sig===loSig()||sig===L+"|"+F||sig===L;};
+
+/* camp build plots: two per unlocked camp. Until camps are ticked, assume just enough for what's built */
+const facBuilt=()=>FAC.filter(f=>(S.fac[f.id]||0)>0).length;
+const campsOpen=()=>CAMPS.filter(([id])=>S.camps[id]);
+function plotInfo(){
+  const built=facBuilt(),open=campsOpen().length,cap=Math.max(2*open,2*Math.ceil(built/2),2);
+  return {built,open,cap,free:Math.max(0,cap-built),odd:open>0&&built>2*open};
+}
+function campBar(){
+  const P=plotInfo();
+  const msg=!P.open?`${P.built} built. Tick the camps you've unlocked so the AI knows how many build plots you have.`
+    :P.odd?`${P.built} built but only ${P.open} camp${P.open>1?"s":""} ticked. Tick the other camp you've unlocked.`
+    :`${P.built} of ${P.cap} plots used. `+(P.free?`${P.free} free.`:P.open<3?"No free plots. Unlock another camp for 2 more.":"All plots used.");
+  return `<div class="lo-camps"><div class="lo-cl">Camps unlocked</div><div class="chips">${CAMPS.map(([id,n])=>`<button class="chip" data-camp="${id}" aria-pressed="${!!S.camps[id]}">${h(n)}</button>`).join("")}</div><p class="lo-plots ${P.free||!P.open?"":"full"}">${h(msg)}</p></div>`;
+}
+/* camp state for the AI, with an explicit rule when the plots are full */
+function campLine(){
+  const P=plotInfo(),open=campsOpen(),locked=CAMPS.filter(([id])=>!S.camps[id]);
+  return `Guerrilla camps unlocked: ${open.length?open.map(([,n,r])=>n+" ("+r+")").join(", "):"not logged by the player"}. Build plots: ${P.cap} (two per camp), ${P.built} used, ${P.free} free.`
+    +(open.length&&locked.length?" Still locked: "+locked.map(([,n,r,m])=>`${n} in ${r} (opens with the operation ${m})`).join("; ")+".":"")
+    +(P.free?"":" No free plot right now, so do not tell the player to build a new facility. Suggest upgrading one they've built, and say which camp to unlock (and how) to get two more plots.");
+}
 /* set a camp facility tier. The Hunter's Lodge tiers hand over weapons, so tick those too */
 function setFac(id,lv){
   S.fac[id]=lv;const added=[];
@@ -742,9 +773,10 @@ function loBoard(){
   o+=`<div class="lo-h">Weapons<span>${nW}/4</span></div>`+LO_W.map(wCard).join("");
   o+=`<div class="lo-h">Supremo</div><button class="lo-slot ${si?"":"empty"}" data-lo="sup"><span class="lo-sl">Backpack</span><span class="lo-sn">${si?h(si.n):"Empty"}</span>${si?"":`<span class="lo-ss">Tap to equip a Supremo and its gadgets</span>`}<span class="lo-gad">${gad}</span>${sockT?`<span class="lo-tags">${sockT}</span>`:""}</button>`;
   o+=`<div class="lo-h">Gear<span>${nG}/5</span></div><div class="lo-grid">${LO_G.map(([k,lab])=>gCard(k,lab)).join("")}${gCard("amigo","Amigo")}</div>`;
+  const PL=plotInfo();
   const fCard=f=>{const lv=S.fac[f.id]||0;
-    return `<button class="lo-slot ${lv?"":"empty"}" data-lofac="${f.id}"><span class="lo-sn">${h(f.n)}</span><span class="lo-ss">${lv?TIERS[lv]:"Not built"}</span><span class="lo-tier">${[1,2,3].map(i=>`<i class="${lv>=i?"on":""}"></i>`).join("")}</span></button>`;};
-  o+=`<div class="lo-h">Camp<span>${FAC.filter(f=>(S.fac[f.id]||0)>0).length}/6 built</span></div><div class="lo-grid">${FAC.map(fCard).join("")}</div>`;
+    return `<button class="lo-slot ${lv?"":"empty"}" data-lofac="${f.id}"><span class="lo-sn">${h(f.n)}</span><span class="lo-ss">${lv?TIERS[lv]:PL.free?"Not built":"No free plot"}</span><span class="lo-tier">${[1,2,3].map(i=>`<i class="${lv>=i?"on":""}"></i>`).join("")}</span></button>`;};
+  o+=`<div class="lo-h">Camp<span>${PL.built}/${PL.cap} plots used</span></div>${campBar()}<div class="lo-grid">${FAC.map(fCard).join("")}</div>`;
   const busy=UI.busy,last=S.briefs.find(b=>b.kind==="loadout");
   o+=`<div class="lo-ask"><input class="search" type="text" id="loJob" maxlength="80" autocomplete="off" placeholder="Next job (optional), e.g. FND base, tank convoy" aria-label="Next job" value="${h(L.job||"")}"><button class="btn block" data-order="loadout" ${busy||!C.key?"disabled":""}>What should I change?</button></div>`;
   if(!C.key)o+=needKey();
@@ -833,7 +865,7 @@ function sheetSupBench(){
 function sheetFac(){
   const f=FAC.find(x=>x.id===UI.pick.fac),lv=S.fac[f.id]||0;
   return `<div class="sheet-top"><h2>${h(f.n)}</h2><button class="iconbtn" data-act="close" aria-label="Close">×</button></div>
-  <p>Tap the tier you've built. Each main camp holds two facilities.</p>
+  <p>Tap the tier you've built.${lv?"":plotInfo().free?" You have a free build plot for it.":" All your build plots are used, so this needs another camp unlocked first."}</p>
   <div class="tiers">${TIERS.map((t,i)=>`<button data-lotier="${i}" aria-pressed="${lv===i}">${t}</button>`).join("")}</div>
   ${f.t.map((d,i)=>`<div class="lo-tierrow ${lv>i?"got":""}"><b>${TIERS[i+1]}${lv>i?" ✓":""}</b>${h(d)}</div>`).join("")}
   <div class="rowbtns" style="margin-top:18px"><button class="btn dark" data-act="close">Done</button></div>`;
@@ -905,6 +937,7 @@ function logbook(){
   L.push(`Gear owned: ${gear.concat(namesOf(GSING)).join("; ")||"none logged"}.`);
   L.push(`Amigos: ${namesOf(AMI).join(", ")||"none"}.`);
   L.push(`Camp facilities: ${FAC.map(f=>`${f.n}: ${TIERS[S.fac[f.id]||0]}`).join("; ")}.`);
+  L.push(campLine());
   REGIONS.forEach(r=>{const d=OPS[r.id].filter(n=>S.done[opId(n)]);
     if(d.length||r.id===S.region){const left=OPS[r.id].filter(n=>!S.done[opId(n)]);
       L.push(`Operations in ${r.n}: ${d.length}/${OPS[r.id].length} done${d.length?" ("+d.join(", ")+")":""}.${left.length?" Not done: "+left.join(", ")+".":""}`);}
@@ -932,7 +965,7 @@ function fieldNotes(){
     "Juan's arms dealers show as a green shopping-cart icon on the map. They sell Resolver weapons and Supremos for depleted uranium, plus standard weapons and gear as your rank goes up",
     "Depleted uranium comes from destroying anti-aircraft cannons",
     "Supremo-Bond: every ambush and supply drop gives one, and some Libertad crates and Bandidos operations give more",
-    "Camp facilities are built and upgraded at the Construction Desk in a Libertad camp, paid mainly in Yaran pesos. Each of the three main camps has two plots",
+    "Camp facilities are built and upgraded at the Construction Desk (green hammer icon, talk to the Foreman) in a guerrilla camp, paid in materials such as medicine, metal and gasolina. Each upgrade needs the tier before it. There are three camps with two build plots each, and each facility can only be built once: "+CAMPS.map(([,n,r,m])=>`${n} in ${r} opens with the operation ${m}`).join("; "),
     "Standard weapons come from Juan's arms dealers by rank, the Guerrilla Garrison by tier, and FND crates. The Bandidos Barracks sells gear"
   ].join(". ")+".");
   return N.join("\n");
@@ -955,6 +988,7 @@ WHAT YOU KNOW
 - LOGBOOK is what the player has unlocked and done. Trust it.
 - CURRENT LOADOUT is exactly what they have equipped right now. Anything equipped counts as owned.
 - Recommend things they own. If something they don't own is clearly better, say exactly where to get it and check its rank against theirs.
+- Only suggest what they can do right now. Never tell them to build a camp facility when the LOGBOOK shows no free build plot, or to use anything locked behind a rank, camp or mission they haven't reached. If something good is locked, say what unlocks it instead.
 - Use FIELD NOTES first for locations and how things work, then your own knowledge of Far Cry 6.
 - Never make up a location, cost or number. If you're not sure of the exact spot, say "not sure of the exact spot" and give the best way to find it in game, such as the map icon to look for or the area to search.
 
@@ -1013,11 +1047,11 @@ async function gemini(turns){
 }
 const ORDERS={
  next:["What should I do next?","What should I do next? Main point 1: the single best mission or activity for me right now, with sub-points Where: (region, area and the nearest camp or hideout to fast travel to), How: (how to start it, such as who gives it or which map marker, then the main steps with no story spoilers) and Bring: (what from my loadout to use or swap first). Then two back-ups as main points, each with Where: and How:. Last main point: one thing to grab or equip before I go, with Where: and How:."],
- buy:["What should I buy next?","What should I buy or pick up next? Up to three weapons (including any Resolver weapon or Supremo I can get at my rank) and up to three gear pieces that suit how I play, in the order to get them. Each one is a main point with sub-points: Where: (the vendor or exact spot, with region and area), How: (the steps to get there and get it, including anything needed first such as a rank, a facility tier, a key or a treasure hunt), Cost: (if known) and Replaces: (which loadout slot it goes in). If my Guerrilla Garrison or Bandidos Barracks isn't built, make building it the first main point, with Where:, How: and Cost:."],
+ buy:["What should I buy next?","What should I buy or pick up next? Up to three weapons (including any Resolver weapon or Supremo I can get at my rank) and up to three gear pieces that suit how I play, in the order to get them. Each one is a main point with sub-points: Where: (the vendor or exact spot, with region and area), How: (the steps to get there and get it, including anything needed first such as a rank, a facility tier, a key or a treasure hunt), Cost: (if known) and Replaces: (which loadout slot it goes in). If my Guerrilla Garrison or Bandidos Barracks isn't built and I have a free build plot, make building it the first main point, with Where:, How: and Cost:."],
  mods:["Which mods should I build?","Which workbench mods and ammo should I build next for the weapons in my current loadout (or my owned weapons if no loadout is entered)? Each one is a main point ('weapon: mod or ammo') with sub-points: Why: (what it fixes), How: (the workbench steps, and the nearest place with a workbench) and Cost: (materials). Last main point: the materials to farm, each with Where: and How:."],
- camp:["Which camp build comes first?","Which camp facilities should I build or upgrade next? My next three builds in order. Each one is a main point with sub-points: Gets you: (what it unlocks), Where: (which camp's Construction Desk), How: (the steps) and Cost: (if known)."],
+ camp:["Which camp build comes first?","What should I build or upgrade at my camps next? Check my build plots in the LOGBOOK first: only suggest a new facility if I have a free plot, otherwise only upgrades to facilities I've built. Give my next three steps in order. Each one is a main point with sub-points: Gets you: (what it unlocks), Where: (which camp's Construction Desk), How: (the steps) and Cost: (if known). If my plots are full, finish with one main point on which camp to unlock next for two more plots, with Where: and How:."],
  full:["Full briefing","Full briefing with these short headings: Next mission; Loadout changes; Buy or grab next; Workbench; Camp. Under each heading, give main points for the actions, each with Where: and How: sub-points, plus Cost: when something costs. Up to about 450 words."],
- loadout:["Loadout check","Check my CURRENT LOADOUT and my camp facilities (in the LOGBOOK) and tell me exactly what to change. One main point per change, written as 'Slot: what to do', e.g. 'Primary 2: switch the ammo to **Armor Piercing Rounds**'. Under each, add sub-points: How: (the exact steps, such as the pause menu Arsenal tab for a swap or a workbench for ammo and mods, and the nearest place to do it), Where: (where to get anything I don't own yet, with region and area) and Cost: (if it costs anything). Use things I own. Only name something I don't own if nothing I own fits. Fill any empty slot. Make sure my three primaries cover unarmoured soldiers, armoured soldiers and vehicles between them, that my muzzles and gear suit how I play, and that my Supremo gadgets back up my weapons. If a next job is given, set me up for that. Leave out slots that are already right, then one main point starting 'Keep:' that lists them. Last, one main point starting 'Camp:' with the single next facility to build or upgrade and what it gets me, with Where:, How: and Cost: sub-points, unless all six are Perfected. If nothing needs changing, say that in one point."]
+ loadout:["Loadout check","Check my CURRENT LOADOUT and my camp facilities (in the LOGBOOK) and tell me exactly what to change. One main point per change, written as 'Slot: what to do', e.g. 'Primary 2: switch the ammo to **Armor Piercing Rounds**'. Under each, add sub-points: How: (the exact steps, such as the pause menu Arsenal tab for a swap or a workbench for ammo and mods, and the nearest place to do it), Where: (where to get anything I don't own yet, with region and area) and Cost: (if it costs anything). Use things I own. Only name something I don't own if nothing I own fits. Fill any empty slot. Make sure my three primaries cover unarmoured soldiers, armoured soldiers and vehicles between them, that my muzzles and gear suit how I play, and that my Supremo gadgets back up my weapons. If a next job is given, set me up for that. Leave out slots that are already right, then one main point starting 'Keep:' that lists them. Last, one main point starting 'Camp:' with the single next camp step and what it gets me, with Where:, How: and Cost: sub-points: a new facility only if I have a free build plot, otherwise an upgrade to one I've built. Skip it if everything I've built is Perfected and no plot is free. If nothing needs changing, say that in one point."]
 };
 const QUICK=["How do I get gunpowder?","Where do I find depleted uranium?","How do I get Supremo-Bond?","What beats tanks early on?","Best ammo against armoured soldiers?","How do I earn pesos fast?"];
 async function runOrder(k){
@@ -1137,8 +1171,10 @@ function toggle(id){
   else if(id.startsWith("m:")||id.startsWith("y:")){
     S.done[id]=!S.done[id];if(!S.done[id])delete S.done[id];
     else{const name=[].concat(...Object.values(OPS),...Object.values(STORIES)).find(n=>opId(n)===id||stId(n)===id);
-      const rw=REWARDS[name];if(rw){const added=[];rw.forEach(n=>(BYNAME[n]||[]).forEach(i=>{if(!S.have[i]){S.have[i]=1;if(!added.includes(n))added.push(n);}}));
-        if(added.length)toast("Also marked as unlocked: "+added.join(", "));}}
+      const added=[],rw=REWARDS[name];
+      if(rw)rw.forEach(n=>(BYNAME[n]||[]).forEach(i=>{if(!S.have[i]){S.have[i]=1;if(!added.includes(n))added.push(n);}}));
+      const camp=CAMPS.find(c=>c[3]===name);if(camp&&!S.camps[camp[0]]){S.camps[camp[0]]=true;added.push(camp[1]+" camp");}
+      if(added.length)toast("Also marked as unlocked: "+added.join(", "));}
   }else{if(S.have[id])delete S.have[id];else S.have[id]=1;}
   save();renderHeader();renderList();
 }
@@ -1157,6 +1193,7 @@ document.addEventListener("click",e=>{
   if(d.delbrief){S.briefs=S.briefs.filter(b=>String(b.id)!==d.delbrief);save();render();return;}
   if(d.lo){loOpen(d.lo);return;}
   if(d.lofac){UI.pick={slot:"fac",fac:d.lofac};sheetLo(true);return;}
+  if(d.camp){S.camps[d.camp]=!S.camps[d.camp];save();renderList();return;}
   if(UI.pick){
     const P=UI.pick;
     if(d.lotier&&P.slot==="fac"){setFac(P.fac,+d.lotier);sheetLo();return;}
